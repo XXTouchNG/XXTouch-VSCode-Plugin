@@ -1,0 +1,7 @@
+{
+  "main": {
+    "prefix": "main",
+    "body": ["function main()", "  $1", "end"],
+    "description": "脚本主入口"
+  }
+}

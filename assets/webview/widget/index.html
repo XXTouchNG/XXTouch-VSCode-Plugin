@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>控件抓抓</title>
+
+  <script src="react.production.min.js"></script>
+  <script src="react-dom.production.min.js"></script>
+  <script src="babel.min.js"></script>
+  <script src="antd.min.js"></script>
+  <script src="jimp.min.js"></script>
+  <link rel="stylesheet" href="antd.dark.min.css" />
+  <link rel="stylesheet" href="material-icons.min.css" />
+
+  <style>
+    body {
+      padding: 0;
+    }
+
+    .left {
+      height: 100vh;
+      width: 400px !important;
+      min-width: 400px !important;
+      position: fixed;
+      left: 0;
+      z-index: 99999;
+      overflow-y: auto;
+    }
+
+    .right {
+      margin-left: 400px;
+    }
+
+    .content {
+      padding-bottom: 10px;
+    }
+
+    .img {
+      max-width: none;
+      max-height: none;
+    }
+
+    .widget {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border: 1px dashed red;
+    }
+  </style>
+
+  <script type="text/babel">
+    const { Button, Layout, Input, Table, message } = antd
+    const { TextArea } = Input
+    const { Sider } = Layout
+    const vscode = acquireVsCodeApi()
+
+    window.onload = () => {
+      const app = document.querySelector('#app')
+      ReactDOM.render(<App />, app)
+    }
+
+    function copyText(text) {
+      vscode.postMessage({ command: 'copy', payload: text })
+      message.info(
+        `${text.slice(0, 30)}${text.length > 30 ? '...' : ''} 已复制到剪贴板`
+      )
+    }
+
+    function App() {
+      const contentRef = React.useRef(null)
+      const [image, setImage] = React.useState({
+        jimp: null,
+        base64: '',
+      })
+      const [widgetList, setWidgetList] = React.useState([])
+      const [divList, setDivList] = React.useState([])
+      const [dataSource, setDataSource] = React.useState([])
+      const [selected, setSelected] = React.useState([])
+      const [code, setCode] = React.useState('')
+
+      const columns = [
+        {
+          title: '属性',
+          dataIndex: 'key',
+          key: 'key',
+          width: '105px',
+        },
+        {
+          title: '值',
+          dataIndex: 'val',
+          key: 'val',
+          ellipsis: true,
+          onCell: (record) => {
+            return {
+              onClick: () => {
+                copyText(record.val)
+              },
+            }
+          },
+        },
+      ]
+
+      React.useEffect(() => {
+        vscode.postMessage({ command: 'init' })
+      }, [])
+
+      React.useEffect(() => {
+        async function onMessage(event) {
+          const message = event.data
+          if (message.command === 'init') {
+            initImage(message)
+            initWidget(message)
+          }
+        }
+
+        window.addEventListener('message', onMessage)
+        return () => {
+          window.removeEventListener('message', onMessage)
+        }
+      })
+
+      async function initImage(message) {
+        const jimp = await Jimp.read(
+          Buffer.from(message.payload.screen, 'base64')
+        )
+        setImage({
+          jimp: jimp,
+          base64: await jimp.getBase64Async(Jimp.MIME_PNG),
+        })
+      }
+
+      async function initWidget(message) {
+        divList.forEach((div) => div.parentElement.removeChild(div))
+
+        setWidgetList(message.payload.widget)
+        const divs = []
+        for (const [i, w] of message.payload.widget.entries()) {
+          const div = document.createElement('div')
+          const r = w.region
+          div.className = 'widget'
+          div.id = `${i}`
+          div.style.top = `${r.top / 2}px`
+          div.style.left = `${400 + r.left / 2}px`
+          div.style.width = `${(r.right - r.left) / 2}px`
+          div.style.height = `${(r.bottom - r.top) / 2}px`
+          div.style.position = 'absolute'
+          div.style.zIndex = `${w.zIndex}`
+          contentRef.current.appendChild(div)
+          divs.push(div)
+        }
+        setDivList(divs)
+      }
+
+      function onMouseDown(e) {
+        const w = widgetList[e.target.id]
+        const quote = (s) => `"${s}"`
+        const ds = [
+          { key: 'id', val: quote(w.id) },
+          { key: 'text', val: quote(w.text) },
+          { key: 'type', val: quote(w.type) },
+          { key: 'desc', val: quote(w.desc) },
+          { key: 'path', val: quote(w.path) },
+          { key: 'clickable', val: w.clickable.toString() },
+          { key: 'longClickable', val: w.longClickable.toString() },
+          { key: 'scrollable', val: w.scrollable.toString() },
+          { key: 'editable', val: w.editable.toString() },
+          { key: 'checkable', val: w.checkable.toString() },
+          { key: 'focusable', val: w.focusable.toString() },
+          { key: 'visible', val: w.visible.toString() },
+        ]
+        setDataSource(ds)
+        generateCode(ds)
+      }
+
+      function onFetch() {
+        vscode.postMessage({ command: 'fetch' })
+      }
+
+      function generateCode(ds, sel) {
+        if (!sel) {
+          sel = selected
+        }
+        if (!sel.length) {
+          setCode('')
+          return
+        }
+        let code = 'widget.find({\n'
+        for (const it of sel) {
+          ds.forEach((v) => {
+            if (v.key === it) {
+              code += `    ${it} = ${v.val},\n`
+            }
+          })
+        }
+        code += '})'
+        setCode(code)
+      }
+
+      function onCopyCode() {
+        copyText(code)
+      }
+
+      const rowSelection = {
+        selected,
+        onChange: (sel) => {
+          setSelected(sel)
+          generateCode(dataSource, sel)
+        },
+      }
+
+      return (
+        <Layout>
+          <Sider className="left" theme="dark">
+            <Button
+              type="primary"
+              style={{ width: '100%' }}
+              onClick={onFetch}
+            >
+              获取布局
+            </Button>
+            <Table
+              showHeader={true}
+              bordered={true}
+              size="small"
+              pagination={false}
+              rowSelection={rowSelection}
+              dataSource={dataSource}
+              columns={columns}
+            />
+            <TextArea
+              autoSize={{ minRows: 3, maxRows: 10 }}
+              value={code}
+              readOnly
+            />
+            <Button style={{ width: '100%' }} onClick={onCopyCode}>
+              复制
+            </Button>
+          </Sider>
+          <Layout className="right">
+            <div
+              className="content"
+              ref={contentRef}
+              onMouseDown={onMouseDown}
+            >
+              <img
+                className="img"
+                src={image.base64}
+                alt=""
+                draggable="false"
+              />
+            </div>
+          </Layout>
+        </Layout>
+      )
+    }
+  </script>
+</head>
+
+<body>
+  <div id="app"></div>
+</body>
+
+</html>
