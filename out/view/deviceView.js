@@ -15,6 +15,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const vscode = require("vscode");
+const broadcastAddress = require("broadcast-address");
 const api_1 = require("../lib/api");
 const fileView_1 = require("./fileView");
 const infoView_1 = require("./infoView");
@@ -70,6 +71,15 @@ class DeviceDataProvider {
                 }
             });
             client.send('touchelf', 14099, '255.255.255.255');
+            for (const [ifname, addresses] of Object.entries(os.networkInterfaces())) {
+                if (ifname.startsWith("en")) {
+                    addresses.forEach((address) => {
+                        if (address.family === "IPv4" && !address.address.startsWith("169.254.")) {
+                            client.send('touchelf', 14099, broadcastAddress(ifname));
+                        }
+                    });
+                }
+            }
         });
         client.bind();
     }
@@ -90,18 +100,18 @@ function initDeviceView(context) {
     vscode.commands.registerCommand('touchelf.device.add', () => {
         vscode.window
             .showInputBox({
-            prompt: '设备IP地址',
-        })
+                prompt: '设备IP地址',
+            })
             .then((ip) => {
-            if (ip) {
-                if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ip)) {
-                    deviceDataProvider.add(ip);
+                if (ip) {
+                    if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ip)) {
+                        deviceDataProvider.add(ip);
+                    }
+                    else {
+                        vscode.window.showErrorMessage('错误的IP格式');
+                    }
                 }
-                else {
-                    vscode.window.showErrorMessage('错误的IP格式');
-                }
-            }
-        });
+            });
     });
     vscode.commands.registerCommand('touchelf.device.select', (ip) => __awaiter(this, void 0, void 0, function* () {
         exports.currentDevice = ip;
@@ -185,16 +195,16 @@ function initDeviceView(context) {
                 case 'openLocal':
                     vscode.window
                         .showOpenDialog({
-                        filters: { 图片: ['png'] },
-                    })
+                            filters: { 图片: ['png'] },
+                        })
                         .then((info) => __awaiter(this, void 0, void 0, function* () {
-                        if (info && info.length) {
-                            webviewPanel.webview.postMessage({
-                                command: 'init',
-                                payload: Buffer.from(fs.readFileSync(info[0].fsPath)).toString('base64'),
-                            });
-                        }
-                    }));
+                            if (info && info.length) {
+                                webviewPanel.webview.postMessage({
+                                    command: 'init',
+                                    payload: Buffer.from(fs.readFileSync(info[0].fsPath)).toString('base64'),
+                                });
+                            }
+                        }));
                     break;
                 case 'copy':
                     vscode.env.clipboard.writeText(message.payload);
@@ -207,15 +217,15 @@ function initDeviceView(context) {
                         }
                         vscode.window
                             .showSaveDialog({
-                            defaultUri: vscode.Uri.file(path.join(lastSave, `截图${Date.now()}.png`)),
-                        })
+                                defaultUri: vscode.Uri.file(path.join(lastSave, `截图${Date.now()}.png`)),
+                            })
                             .then((info) => {
-                            if (info) {
-                                context.globalState.update('lastSave', path.dirname(info.fsPath));
-                                fs.writeFileSync(info.fsPath, Buffer.from(message.payload, 'base64'));
-                                vscode.window.setStatusBarMessage(`图片保存成功`, 5000);
-                            }
-                        });
+                                if (info) {
+                                    context.globalState.update('lastSave', path.dirname(info.fsPath));
+                                    fs.writeFileSync(info.fsPath, Buffer.from(message.payload, 'base64'));
+                                    vscode.window.setStatusBarMessage(`图片保存成功`, 5000);
+                                }
+                            });
                     }
                     break;
                 case 'loadTemplate':

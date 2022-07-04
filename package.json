@@ -46,6 +46,7 @@
 	},
 	"dependencies": {
 		"axios": "^0.21.0",
+		"broadcast-address": "^1.0.2",
 		"diff": "^5.0.0",
 		"lua-fmt-ext": "^3.0.5",
 		"tar": "^6.0.5",
