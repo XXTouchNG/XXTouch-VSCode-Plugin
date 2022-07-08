@@ -477,60 +477,60 @@
       ]
       const dataSource = [
         {
-          name: 'pointInitList',
+          name: '\$pointInitList',
           note: '原始点列表',
         },
         {
-          name: 'pointList',
+          name: '\$pointList',
           note: '相对点列表',
         },
         {
-          name: 'xMin',
-          note: '最小x坐标',
+          name: '\$xMin',
+          note: '最小横坐标',
         },
         {
-          name: 'yMin',
-          note: '最小y坐标',
+          name: '\$yMin',
+          note: '最小纵坐标',
         },
         {
-          name: 'xMax',
-          note: '最大x坐标',
+          name: '\$xMax',
+          note: '最大横坐标',
         },
         {
-          name: 'yMax',
-          note: '最大y坐标',
+          name: '\$yMax',
+          note: '最大纵坐标',
         },
         {
-          name: 'xFirst',
-          note: '起始x坐标',
+          name: '\$xFirst',
+          note: '起始横坐标',
         },
         {
-          name: 'yFirst',
-          note: '起始y坐标',
+          name: '\$yFirst',
+          note: '起始纵坐标',
         },
         {
-          name: 'point[n].x',
-          note: '第n个点的x坐标',
+          name: '\$point[n].x',
+          note: '第 n 个点的横坐标',
         },
         {
-          name: 'point[n].y',
-          note: '第n个点的y坐标',
+          name: '\$point[n].y',
+          note: '第 n 个点的纵坐标',
         },
         {
-          name: 'point[n].c',
-          note: '第n个点的颜色值',
+          name: '\$point[n].c',
+          note: '第 n 个点的颜色值',
         },
         {
-          name: 'record[n].x',
-          note: '第n个颜色记录的x坐标',
+          name: '\$record[n].x',
+          note: '第 n 个颜色记录的横坐标',
         },
         {
-          name: 'record[n].y',
-          note: '第n个颜色记录的y坐标',
+          name: '\$record[n].y',
+          note: '第 n 个颜色记录的纵坐标',
         },
         {
-          name: 'record[n].c',
-          note: '第n个颜色记录的颜色值',
+          name: '\$record[n].c',
+          note: '第 n 个颜色记录的颜色值',
         },
       ]
 
@@ -584,11 +584,11 @@
       const [template, setTemplate] = React.useState({
         active: '1',
         template: [
-          'findMultiColorInRegionFuzzy({pointList}, 90, xMin, yMin, xMax, yMax)',
-          'screen.findColor({pointList}, 90, xMin, yMin, xMax, yMax)',
-          'point[1].c',
-          'record[1].x',
-          'record[1].y',
+          '\$pointList',
+          'if (screen.is_colors(\$pointList, 90.0)) then',
+          'x, y = screen.find_color(\$pointList, 90.0)',
+          '\$record[1].x',
+          '\$record[1].y',
         ],
       })
 
@@ -639,11 +639,6 @@
         }
 
         const { x, y, c } = colors[0]
-        let pointList = c
-        for (const color of colors.slice(1)) {
-          pointList += `, ${color.x - x}, ${color.y - y}, ${color.c}`
-        }
-
         const xs = colors.map((v) => v.x)
         const ys = colors.map((v) => v.y)
         const xMin = Math.min(...xs)
@@ -652,9 +647,13 @@
         const yMax = Math.max(...ys)
         const xFirst = x
         const yFirst = y
-        const pointInitList = colors
-          .map((item) => `{${item.x}, ${item.y}, ${item.c}}`)
-          .join(', ')
+
+        const pointInitList = '{\n' + colors
+          .map((item) => `  {${item.x}, ${item.y}, ${item.c}}`)
+          .join(',\n') + '\n}'
+        const pointList = '{\n' + colors
+          .map((item) => `  {${item.x - x}, ${item.y - y}, ${item.c}}`)
+          .join(',\n') + '\n}'
 
         if (!index) {
           index = parseInt(template.active) - 1
@@ -662,28 +661,26 @@
           index = index - 1
         }
         let code = template.template[index]
-          .replace(/pointInitList/g, pointInitList)
-          .replace(/pointList/g, pointList)
-          .replace(/xMin/g, xMin)
-          .replace(/xMax/g, xMax)
-          .replace(/yMin/g, yMin)
-          .replace(/yMax/g, yMax)
-          .replace(/xFirst/g, xFirst)
-          .replace(/yFirst/g, yFirst)
-          .replace(/firstx/g, xFirst)
-          .replace(/firsty/g, yFirst)
+          .replace(/\$pointInitList/g, pointInitList)  // 绝对点顺序表
+          .replace(/\$pointList/g, pointList)          // 相对点顺序表
+          .replace(/\$xMin/g, xMin)
+          .replace(/\$xMax/g, xMax)
+          .replace(/\$yMin/g, yMin)
+          .replace(/\$yMax/g, yMax)
+          .replace(/\$xFirst/g, xFirst)
+          .replace(/\$yFirst/g, yFirst)
         colors.forEach((value, index) => {
           code = code
-            .replace(`point[${index + 1}].x`, value.x)
-            .replace(`point[${index + 1}].y`, value.y)
-            .replace(`point[${index + 1}].c`, value.c)
+            .replace(`\$point[${index + 1}].x`, value.x)
+            .replace(`\$point[${index + 1}].y`, value.y)
+            .replace(`\$point[${index + 1}].c`, value.c)
         })
         record.forEach((value, index) => {
           if (value.c) {
             code = code
-              .replace(`record[${index + 1}].x`, value.x)
-              .replace(`record[${index + 1}].y`, value.y)
-              .replace(`record[${index + 1}].c`, value.c)
+              .replace(`\$record[${index + 1}].x`, value.x)
+              .replace(`\$record[${index + 1}].y`, value.y)
+              .replace(`\$record[${index + 1}].c`, value.c)
           }
         })
 
