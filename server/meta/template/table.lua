@@ -58,4 +58,14 @@ function table.sort(list, comp) end
 ---@param j?   integer
 function table.unpack(list, i, j) end
 
+---#DES 'table.deep_copy'
+---@param src table
+---@return table
+function table.deep_copy(src) end
+
+---#DES 'table.deep_print'
+---@param src table
+---@return string
+function table.deep_print(src) end
+
 return table

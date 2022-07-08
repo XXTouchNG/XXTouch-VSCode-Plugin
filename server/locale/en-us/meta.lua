@@ -65,6 +65,9 @@ print               = [[
 Receives any number of arguments and prints their values to `stdout`, converting each argument to a string following the same rules of $tostring.
 The function print is not intended for formatted output, but only as a quick way to show a value, for instance for debugging. For complete control over the output, use $string.format and $io.write.
 ]]
+print.out           = [[
+Flushes and returns the output buffer.
+]]
 rawequal            = 'Checks whether v1 is equal to v2, without invoking the `__eq` metamethod.'
 rawget              = 'Gets the real value of `table[index]`, without invoking the `__index` metamethod.'
 rawlen              = 'Returns the length of the object `v`, without invoking the `__len` metamethod.'
@@ -329,6 +332,7 @@ os.difftime                 = 'Returns the difference, in seconds, from time `t1
 os.execute                  = 'Passes `command` to be executed by an operating system shell.'
 os.exit['<5.1']             = 'Calls the C function `exit` to terminate the host program.'
 os.exit['>5.2']             = 'Calls the ISO C function `exit` to terminate the host program.'
+os.restart                  = 'Specify the path of the script that needs to be executed next time and terminate the host program.'
 os.getenv                   = 'Returns the value of the process environment variable `varname`.'
 os.remove                   = 'Deletes the file with the given name.'
 os.rename                   = 'Renames the file or directory named `oldname` to `newname`.'
@@ -379,6 +383,25 @@ string.reverse              = 'Returns a string that is the string `s` reversed.
 string.sub                  = 'Returns the substring of the string that starts at `i` and continues until `j`.'
 string.unpack               = 'Returns the values packed in string according to the format string `fmt` (see §6.4.2) .'
 string.upper                = 'Returns a copy of this string with all lowercase letters changed to uppercase.'
+string.to_hex               = 'Returns a string of the hexadecimal representation of the string.'
+string.from_hex             = 'Returns a string with the string hexadecimal representation given.'
+string.from_gbk             = 'Convert GBK-encoded text to UTF-8-encoded text.'
+string.md5                  = 'Returns a string of the MD5 hash of the string.'
+string.sha1                 = 'Returns a string of the SHA1 hash of the string.'
+string.sha256               = 'Returns a string of the SHA256 hash of the string.'
+string.sha512               = 'Returns a string of the SHA512 hash of the string.'
+string.base64_encode        = 'Returns a string of the Base64 encoded string.'
+string.base64_decode        = 'Returns a string of the Base64 decoded string.'
+string.aes128_encrypt       = 'Returns a string of the AES128 encrypted string.'
+string.aes128_decrypt       = 'Returns a string of the AES128 decrypted string.'
+string.split                = 'Returns a table of substrings separated by a delimiter.'
+string.ltrim                = 'Returns a string with all leading white space removed.'
+string.rtrim                = 'Returns a string with all trailing white space removed.'
+string.trim                 = 'Returns a string with all leading and trailing white space removed.'
+string.atrim                = 'Returns a string with all white space removed.'
+string.strip_utf8_bom       = 'Returns a string with the UTF-8 BOM removed.'
+string.random               = 'Returns a string with `n` random characters.'
+string.compare_version      = 'Compare two version numbers, Version number A is greater than version number B returns 1, version number A is less than version number B returns -1, version number equal returns 0.'
 
 table                       = ''
 table.concat                = 'Given a list where all elements are strings or numbers, returns the string `list[i]..sep..list[i+1] ··· sep..list[j]`.'
@@ -400,6 +423,22 @@ Returns the elements from the given list. This function is equivalent to
     return list[i], list[i+1], ···, list[j]
 ```
 By default, `i` is `1` and `j` is `#list`.
+]]
+table.deep_copy             = [[
+Returns a copy of the given table.
+```lua
+    local t = {1, 2, {3, 4}, 5}
+    local c = table.deep_copy(t)
+    c[3][1] = 6
+    print(t[3][1]) -- prints 4
+```
+]]
+table.deep_print            = [[
+Returns a description of the given table.
+```lua
+    local t = {1, 2, {3, 4}, 5}
+    print(table.deep_print(t))
+```
 ]]
 
 utf8                        = ''

@@ -44,6 +44,12 @@ function os.exit(code, close) end
 function os.exit(code, close) end
 ---#end
 
+---#DES 'os.restart'
+---@param path? string
+---@return boolean succeed
+---@return string? errmsg
+function os.restart(path) end
+
 ---#DES 'os.getenv'
 ---@param varname string
 ---@return string

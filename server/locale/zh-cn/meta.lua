@@ -60,6 +60,7 @@ paris               = [[
 ]]
 pcall               = '传入参数，以 *保护模式* 调用函数 `f` 。 这意味着 `f` 中的任何错误不会抛出； 取而代之的是，`pcall` 会将错误捕获到，并返回一个状态码。 第一个返回值是状态码（一个布尔量）， 当没有错误时，其为真。 此时，`pcall` 同样会在状态码后返回所有调用的结果。 在有错误时，`pcall` 返回 `false` 加错误消息。'
 print               = '接收任意数量的参数，并将它们的值打印到 `stdout`。 它用 `tostring` 函数将每个参数都转换为字符串。 `print` 不用于做格式化输出。仅作为看一下某个值的快捷方式。 多用于调试。 完整的对输出的控制，请使用 $string.format 以及 $io.write。'
+print.out           = '将 print 函数打印的缓冲区清空并返回缓冲区内容。'
 rawequal            = '在不触发任何元方法的情况下 检查 `v1` 是否和 `v2` 相等。 返回一个布尔量。'
 rawget              = '在不触发任何元方法的情况下 获取 `table[index]` 的值。 `table` 必须是一张表； `index` 可以是任何值。'
 rawlen              = '在不触发任何元方法的情况下 返回对象 `v` 的长度。 `v` 可以是表或字符串。 它返回一个整数。'
@@ -307,6 +308,7 @@ os.difftime                 = '返回以秒计算的时刻 `t1` 到 `t2` 的差�
 os.execute                  = '调用系统解释器执行 `command`。'
 os.exit['<5.1']             = '调用 C 函数 `exit` 终止宿主程序。'
 os.exit['>5.2']             = '调用 ISO C 函数 `exit` 终止宿主程序。'
+os.restart                  = '指定下一次需要执行的脚本路径，并终止宿主程序。'
 os.getenv                   = '返回进程环境变量 `varname` 的值。'
 os.remove                   = '删除指定名字的文件。'
 os.rename                   = '将名字为 `oldname` 的文件或目录更名为 `newname`。'
@@ -357,6 +359,25 @@ string.reverse              = '返回字符串 s 的翻转串。'
 string.sub                  = '返回字符串的子串， 该子串从 `i` 开始到 `j` 为止。'
 string.unpack               = '返回以格式 fmt （参见 §6.4.2） 打包在字符串 s （参见 string.pack） 中的值。'
 string.upper                = '接收一个字符串，将其中的小写字符都转为大写后返回其副本。'
+string.to_hex               = '返回一个字符串的十六进制表示。'
+string.from_hex             = '转换一个十六进制表示到其原始数据。'
+string.from_gbk             = '将 GBK 编码的文本转成 UTF-8 编码的文本。'
+string.md5                  = '返回一个字符串的 MD5 散列。'
+string.sha1                 = '返回一个字符串的 SHA1 散列。'
+string.sha256               = '返回一个字符串的 SHA256 散列。'
+string.sha512               = '返回一个字符串的 SHA512 散列。'
+string.base64_encode        = '返回一个字符串的 Base64 编码。'
+string.base64_decode        = '解码一个通过 Base64 编码过的字符串。'
+string.aes128_encrypt       = '对字符串进行 AES128 加密。'
+string.aes128_decrypt       = '解密一段已加密的字符串。'
+string.split                = '将字符串以指定的分隔符分割成一个或多个子串。'
+string.ltrim                = '去除文本左边的空白字符。'
+string.rtrim                = '去除文本右边的空白字符。'
+string.trim                 = '去除文本两边的空白字符。'
+string.atrim                = '去除文本中所有的空白字符。'
+string.strip_utf8_bom       = '去除 UTF-8 文本的 BOM （Byte Order Mark）。'
+string.random               = '生成一个指定范围和长度的随机字符串。'
+string.compare_version      = '比较两个版本号的大小。版本号甲大于版本号乙返回 1，版本号甲小于版本号乙返回 -1，版本号相等返回 0。'
 
 table                       = ''
 table.concat                = '提供一个列表，其所有元素都是字符串或数字，返回字符串 `list[i]..sep..list[i+1] ··· sep..list[j]`。'
@@ -378,6 +399,22 @@ table.unpack                = [[
     return list[i], list[i+1], ···, list[j]
 ```
 i 默认为 1 ，j 默认为 #list。
+]]
+table.deep_copy             = [[
+返回一个深拷贝的表。
+```lua
+    local t = {1, 2, {3, 4}, 5}
+    local c = table.deep_copy(t)
+    c[3][1] = 6
+    print(t[3][1]) -- prints 4
+```
+]]
+table.deep_print            = [[
+返回一个关于指定表的详细描述。
+```lua
+    local t = {1, 2, {3, 4}, 5}
+    print(table.deep_print(t))
+```
 ]]
 
 utf8                        = ''

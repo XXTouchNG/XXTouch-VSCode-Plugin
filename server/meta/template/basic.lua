@@ -150,6 +150,9 @@ function pcall(f, arg1, ...) end
 ---#DES 'print'
 function print(...) end
 
+---#DES 'print.out'
+function print.out(...) end
+
 ---#DES 'rawequal'
 ---@param v1 any
 ---@param v2 any
