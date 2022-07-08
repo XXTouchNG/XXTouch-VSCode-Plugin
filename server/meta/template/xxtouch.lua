@@ -1334,3 +1334,78 @@ end
 ---@return error 错误信息
 function SambaConfig:upload(local_path, path, progress_callback)
 end
+
+
+--------------------------------------------------------------------------------
+-- 弹窗助手模块
+--------------------------------------------------------------------------------
+
+---@class alert*
+alert = {}
+
+--- 打开调试日志
+function alert.enable_logging()
+end
+
+--- 关闭调试日志
+function alert.disable_logging()
+end
+
+--- 打开自动点击
+function alert.enable_autopass()
+end
+
+--- 关闭自动点击
+function alert.disable_autopass()
+end
+
+--- 设置自动点击延迟
+---@param delay number 延迟时间，单位毫秒
+function alert.set_autopass_delay(delay)
+end
+
+--- 设置弹窗助手全局规则
+---@param rules table 弹窗助手全局规则，详见文档
+function alert.get_global_rules(rules)
+end
+
+--- 获取弹窗助手全局规则
+---@return table 弹窗助手全局规则，详见文档
+function alert.get_global_rules()
+end
+
+--- 清空弹窗助手全局规则
+function alert.clear_global_rules()
+end
+
+--- 设置弹窗助手应用程序规则
+---@param appId string App 的应用程序标识符
+---@param rules table 弹窗助手应用程序规则，详见文档
+function alert.set_local_rules(appId, rules)
+end
+
+--- 获取弹窗助手应用程序规则
+---@param appId string App 的应用程序标识符
+---@return table 弹窗助手应用程序规则，详见文档
+function alert.get_local_rules(appId)
+end
+
+--- 清空弹窗助手应用程序规则
+---@param appId string App 的应用程序标识符，使用 "*" 清空全部应用程序规则
+function alert.clear_local_rules(appId)
+end
+
+--- 获取处于最前方的弹窗
+---@return table 弹窗信息，详见文档
+function alert.get_topmost()
+end
+
+--- 点击处于最前方的弹窗
+---@param rule table 处理规则，详见文档
+function alert.dismiss_topmost(rule)
+end
+
+--- 点击处于最前方的弹窗
+---@param button string|integer 需要点击按钮的名称或索引
+function alert.dismiss_topmost(button)
+end
