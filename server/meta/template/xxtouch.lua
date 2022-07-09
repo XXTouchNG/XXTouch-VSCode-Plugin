@@ -1260,6 +1260,13 @@ samba = {}
 --- 新建一个 SAMBA 客户端
 ---@param config table 客户端设置
 ---@return SambaConfig* 客户端对象
+--- ```lua
+---     {
+---         workgroup = 'WORKGROUP',
+---         username = 'useradmin',
+---         password = 'userpassword'
+---     }
+--- ```
 function samba.client(config)
 end
 
@@ -1366,11 +1373,63 @@ end
 
 --- 设置弹窗助手全局规则
 ---@param rules table 弹窗助手全局规则，详见文档
+---
+--- ```lua
+---     {
+---         {
+---             ["title"] = "^About Cydia Installer$",  -- 通过标题过滤弹框 (正则表达式)
+---             ["action"] = { ["title"] = "Close" }  -- 通过标题指定动作 (正则表达式)
+---             ["action"] = 1,  -- 通过索引指定动作 (以 1 为起始, 0 的效果和 1 一致)
+---         },
+---         {
+---             ["title"] = "^Verification Error$",  -- 通过标题过滤弹框 (正则表达式)
+---             ["action"] = { ["title"] = "OK" },
+---             ["action"] = "OK",  -- 通过标题指定动作 (简写)
+---         },
+---         {
+---             ["title"] = "^Enter Cydia\\/APT URL$",  -- 通过标题过滤弹框 (正则表达式)
+---             ["textfields"] = {
+---                 { ["text"] = "https://build.frida.re" },  -- 指定文本框内容
+---             },
+---             ["textfields"] = { "https://" },  -- 指定文本框内容 (简写)
+---             ["action"] = {
+---                 ["title"] = "Add Source",  -- 通过标题指定动作 (正则表达式)
+---                 ["delay"] = 500.0,  -- 设置动作延迟 (毫秒)
+---             },
+---         }
+---      }
+--- ```
 function alert.get_global_rules(rules)
 end
 
 --- 获取弹窗助手全局规则
 ---@return table 弹窗助手全局规则，详见文档
+---
+--- ```lua
+---     {
+---         {
+---             ["title"] = "^About Cydia Installer$",  -- 通过标题过滤弹框 (正则表达式)
+---             ["action"] = { ["title"] = "Close" }  -- 通过标题指定动作 (正则表达式)
+---             ["action"] = 1,  -- 通过索引指定动作 (以 1 为起始, 0 的效果和 1 一致)
+---         },
+---         {
+---             ["title"] = "^Verification Error$",  -- 通过标题过滤弹框 (正则表达式)
+---             ["action"] = { ["title"] = "OK" },
+---             ["action"] = "OK",  -- 通过标题指定动作 (简写)
+---         },
+---         {
+---             ["title"] = "^Enter Cydia\\/APT URL$",  -- 通过标题过滤弹框 (正则表达式)
+---             ["textfields"] = {
+---                 { ["text"] = "https://build.frida.re" },  -- 指定文本框内容
+---             },
+---             ["textfields"] = { "https://" },  -- 指定文本框内容 (简写)
+---             ["action"] = {
+---                 ["title"] = "Add Source",  -- 通过标题指定动作 (正则表达式)
+---                 ["delay"] = 500.0,  -- 设置动作延迟 (毫秒)
+---             },
+---         }
+---      }
+--- ```
 function alert.get_global_rules()
 end
 
@@ -1381,12 +1440,64 @@ end
 --- 设置弹窗助手应用程序规则
 ---@param appId string App 的应用程序标识符
 ---@param rules table 弹窗助手应用程序规则，详见文档
+---
+--- ```lua
+---     {
+---         {
+---             ["title"] = "^About Cydia Installer$",  -- 通过标题过滤弹框 (正则表达式)
+---             ["action"] = { ["title"] = "Close" }  -- 通过标题指定动作 (正则表达式)
+---             ["action"] = 1,  -- 通过索引指定动作 (以 1 为起始, 0 的效果和 1 一致)
+---         },
+---         {
+---             ["title"] = "^Verification Error$",  -- 通过标题过滤弹框 (正则表达式)
+---             ["action"] = { ["title"] = "OK" },
+---             ["action"] = "OK",  -- 通过标题指定动作 (简写)
+---         },
+---         {
+---             ["title"] = "^Enter Cydia\\/APT URL$",  -- 通过标题过滤弹框 (正则表达式)
+---             ["textfields"] = {
+---                 { ["text"] = "https://build.frida.re" },  -- 指定文本框内容
+---             },
+---             ["textfields"] = { "https://" },  -- 指定文本框内容 (简写)
+---             ["action"] = {
+---                 ["title"] = "Add Source",  -- 通过标题指定动作 (正则表达式)
+---                 ["delay"] = 500.0,  -- 设置动作延迟 (毫秒)
+---             },
+---         }
+---      }
+--- ```
 function alert.set_local_rules(appId, rules)
 end
 
 --- 获取弹窗助手应用程序规则
 ---@param appId string App 的应用程序标识符
 ---@return table 弹窗助手应用程序规则，详见文档
+---
+--- ```lua
+---     {
+---         {
+---             ["title"] = "^About Cydia Installer$",  -- 通过标题过滤弹框 (正则表达式)
+---             ["action"] = { ["title"] = "Close" }  -- 通过标题指定动作 (正则表达式)
+---             ["action"] = 1,  -- 通过索引指定动作 (以 1 为起始, 0 的效果和 1 一致)
+---         },
+---         {
+---             ["title"] = "^Verification Error$",  -- 通过标题过滤弹框 (正则表达式)
+---             ["action"] = { ["title"] = "OK" },
+---             ["action"] = "OK",  -- 通过标题指定动作 (简写)
+---         },
+---         {
+---             ["title"] = "^Enter Cydia\\/APT URL$",  -- 通过标题过滤弹框 (正则表达式)
+---             ["textfields"] = {
+---                 { ["text"] = "https://build.frida.re" },  -- 指定文本框内容
+---             },
+---             ["textfields"] = { "https://" },  -- 指定文本框内容 (简写)
+---             ["action"] = {
+---                 ["title"] = "Add Source",  -- 通过标题指定动作 (正则表达式)
+---                 ["delay"] = 500.0,  -- 设置动作延迟 (毫秒)
+---             },
+---         }
+---      }
+--- ```
 function alert.get_local_rules(appId)
 end
 
@@ -1397,15 +1508,400 @@ end
 
 --- 获取处于最前方的弹窗
 ---@return table 弹窗信息，详见文档
+--- ```lua
+---     {  -- table: 0x104cadbf0
+---         textfields = {  -- table: 0x104cadce0
+---             [1] = {  -- table: 0x104cad8e0
+---                 text = "https://",
+---                 placeholder = "",
+---             },
+---         },
+---         actions = {  -- table: 0x104cad9e0
+---             [1] = {  -- table: 0x104cada20
+---                 enabled = true,
+---                 style = "cancel",
+---                 title = "Cancel",
+---             },
+---             [2] = {  -- table: 0x104cae070
+---                 enabled = true,
+---                 style = "default",
+---                 title = "Add Source",
+---             },
+---         },
+---         style = "alert",
+---         message = "",
+---         class = "UIAlertController",
+---         title = "Enter Cydia/APT URL",
+---     }
+--- ```
 function alert.get_topmost()
 end
 
 --- 点击处于最前方的弹窗
 ---@param rule table 处理规则，详见文档
+--- ```lua
+---     {
+---         ["action"] = {
+---             ["title"] = "Log In",
+---             ["delay"] = 1000.0,
+---         }
+---     }
+--- ```
 function alert.dismiss_topmost(rule)
 end
 
 --- 点击处于最前方的弹窗
 ---@param button string|integer 需要点击按钮的名称或索引
 function alert.dismiss_topmost(button)
+end
+
+
+--------------------------------------------------------------------------------
+-- 网页助手模块
+--------------------------------------------------------------------------------
+
+---@class monkey*
+monkey = {}
+
+--- 扫描前台应用中所有的 WebView
+---@return table 所有的 WebView 列表，详见文档
+-- ```lua
+--     {  -- table: 0x10166a0d0
+--         views = {  -- table: 0x10166a110
+--             [1] = {  -- table: 0x10166a1b0
+--                 isInjectable = true,
+--                 responder = "com.saurik.Cydia",
+--                 contentScale = 1.0,
+--                 host = "cydia.saurik.com",
+--                 path = "/ui/ios~iphone/1.1/home",
+--                 loading = false,
+--                 targetClass = "UIWebView",
+--                 class = "CyteWebView",
+--                 contentFrame = {  -- table: 0x10166a4c0
+--                         [1] = 0.0,
+--                         [2] = 0.0,
+--                         [3] = 414.0,
+--                         [4] = 896.0,
+--                 },
+--                 absoluteString = "https://cydia.saurik.com/ui/ios~iphone/1.1/home/",
+--                 scheme = "https",
+--                 objectIdentifier = "C5C93951-ECEE-45D5-BD5A-D436057082B0",
+--             },
+--         },
+--         responder = "com.saurik.Cydia",
+--     }
+-- ```
+function monkey.list_webviews()
+end
+
+--- 使用过滤条件扫描前台应用中的 WebView
+---@param filter table 过滤条件，详见文档
+-- ```lua
+--     {
+--         ["responder"] = "com.apple.mobilesafari",  -- 精确匹配
+--         ["scheme"] = "https",  -- 精确匹配
+--         ["host"] = "www.bing.com",  -- 精确匹配
+--         ["path"] = "/",  -- 精确匹配
+--         ["absoluteString"] = "https://www.bing.com/",  -- 精确匹配
+--         ["url"] = "^https://(www.)?bing.com/$",  -- 等同于 absoluteString 的标准正则匹配
+--     }
+-- ```
+---@return table 符合条件的 WebView 属性表，详见文档
+-- ```lua
+--     {  -- table: 0x102446ca0
+--         isInjectable = true,
+--         responder = "com.apple.mobilesafari",
+--         loading = false,
+--         objectIdentifier = "F7F00685-D7F1-4870-8F0C-92923A0D2EA1",
+--         host = "www.bing.com",
+--         path = "/",
+--         class = "_SFWebView",
+--         absoluteString = "https://www.bing.com/",
+--         targetClass = "WKWebView",
+--         scheme = "https",
+--         contentFrame = {  -- table: 0x102446ce0
+--             [1] = 0.0,
+--             [2] = 98.0,
+--             [3] = 414.0,
+--             [4] = 715.0,
+--         },
+--         contentScale = 1.0,
+--         title = "Bing",
+--         estimatedProgress = 1.0,
+--     }
+-- ```
+function monkey.get_webview(filter)
+end
+
+--- 通过 ID 获取扫描结果中的 WebView
+---@param objectIdentifier string WebView ID
+---@return table WebView 属性表，详见文档
+-- ```lua
+--     {  -- table: 0x100e1fe10
+--         isInjectable = true,
+--         responder = "com.saurik.Cydia",
+--         contentScale = 1.0,
+--         host = "cydia.saurik.com",
+--         path = "/ui/ios~iphone/1.1/home",
+--         loading = false,
+--         targetClass = "UIWebView",
+--         class = "CyteWebView",
+--         contentFrame = {  -- table: 0x100e57ce0
+--             [1] = 0.0,
+--             [2] = 0.0,
+--             [3] = 414.0,
+--             [4] = 896.0,
+--         },
+--         absoluteString = "https://cydia.saurik.com/ui/ios~iphone/1.1/home/",
+--         scheme = "https",
+--         objectIdentifier = "C5C93951-ECEE-45D5-BD5A-D436057082B0",
+--     }
+-- ```
+function monkey.get_webview_id(objectIdentifier)
+end
+
+--- 通过 ID 执行 JavaScript
+---@param objectIdentifier string WebView ID
+---@param script string JavaScript 脚本
+---@return any 脚本执行结果，支持多种类型
+function monkey.eval_id(objectIdentifier, script)
+end
+
+--- 在符合条件的 WebView 中执行 JavaScript
+---@param filter table 过滤条件，详见文档
+-- ```lua
+--     {
+--         ["responder"] = "com.apple.mobilesafari",  -- 精确匹配
+--         ["scheme"] = "https",  -- 精确匹配
+--         ["host"] = "www.bing.com",  -- 精确匹配
+--         ["path"] = "/",  -- 精确匹配
+--         ["absoluteString"] = "https://www.bing.com/",  -- 精确匹配
+--         ["url"] = "^https://(www.)?bing.com/$",  -- 等同于 absoluteString 的标准正则匹配
+--     }
+-- ```
+---@param script string JavaScript 脚本
+---@return any 脚本执行结果，支持多种类型
+function monkey.eval(filter, script)
+end
+
+--- 通过 ID 键入文本
+---@param objectIdentifier string WebView ID
+---@param text string 文本内容
+function monkey.input_id(objectIdentifier, text)
+end
+
+--- 在符合条件的 WebView 中键入文本
+---@param filter table 过滤条件，详见文档
+-- ```lua
+--     {
+--         ["responder"] = "com.apple.mobilesafari",  -- 精确匹配
+--         ["scheme"] = "https",  -- 精确匹配
+--         ["host"] = "www.bing.com",  -- 精确匹配
+--         ["path"] = "/",  -- 精确匹配
+--         ["absoluteString"] = "https://www.bing.com/",  -- 精确匹配
+--         ["url"] = "^https://(www.)?bing.com/$",  -- 等同于 absoluteString 的标准正则匹配
+--     }
+-- ```
+---@param text string 文本内容
+function monkey.input(filter, text)
+end
+
+--- 添加用户脚本
+---@param filter table 过滤条件，详见文档
+-- ```lua
+--     {
+--         ["responder"] = "com.apple.mobilesafari",  -- 精确匹配
+--         ["scheme"] = "https",  -- 精确匹配
+--         ["host"] = "www.bing.com",  -- 精确匹配
+--         ["path"] = "/",  -- 精确匹配
+--         ["absoluteString"] = "https://www.bing.com/",  -- 精确匹配
+--         ["url"] = "^https://(www.)?bing.com/$",  -- 等同于 absoluteString 的标准正则匹配
+--     }
+-- ```
+---@param script string JavaScript 脚本
+---@param executeBeforeLoad boolean 是否在 WebView 加载前执行脚本
+---@param executeInMainFrame boolean 是否在 WebView 主帧框执行脚本
+function monkey.add_userscript(filter, script, executeBeforeLoad, executeInMainFrame)
+end
+
+--- 清空用户脚本
+function monkey.clear_userscripts()
+end
+
+--- 列出所有用户脚本
+---@return table 用户脚本列表，详见文档
+function monkey.list_userscripts()
+end
+
+--- 读取用户脚本消息
+---@param filter table 过滤条件，详见文档
+-- ```lua
+--     {
+--         ["responder"] = "com.apple.mobilesafari",  -- 精确匹配
+--         ["scheme"] = "https",  -- 精确匹配
+--         ["host"] = "www.bing.com",  -- 精确匹配
+--         ["path"] = "/",  -- 精确匹配
+--         ["absoluteString"] = "https://www.bing.com/",  -- 精确匹配
+--         ["url"] = "^https://(www.)?bing.com/$",  -- 等同于 absoluteString 的标准正则匹配
+--     }
+-- ```
+---@return table 用户脚本消息，详见文档
+-- ```lua
+--     {  -- table: 0x127fe2e40
+--         [1] = {  -- table: 0x127f70360
+--             host = "www.bing.com",
+--             frameInfo = {  -- table: 0x127f1a410
+--                 isMainFrame = true,
+--                 securityOrigin = {  -- table: 0x127f33690
+--                         host = "www.bing.com",
+--                         protocol = "https",
+--                         port = 0,
+--                 },
+--                 requestURL = "https://www.bing.com/",
+--             },
+--             path = "/",
+--             scheme = "https",
+--             name = "$_TM_WKNativeLog",
+--             body = {  -- table: 0x127fe2f80
+--                 type = "loaded",
+--                 id = "sb_form",
+--             },
+--             absoluteString = "https://www.bing.com/",
+--         },
+--     }
+-- ```
+function monkey.list_userscript_messages(filter)
+end
+
+--- 清空用户脚本消息
+function monkey.clear_userscript_messages()
+end
+
+--- 获取处于最前方的表单元素
+---@return table 表单元素属性表，详见文档
+-- ```lua
+--     {  -- table: 0x12ad11f70
+--         allowsMultipleSelection = false,
+--         selectedItemValues = {  -- table: 0x127fe19e0
+--             [1] = "Tyrannosaurus",
+--         },
+--         type = "select",
+--         selectedItems = {  -- table: 0x127fe1a50
+--             [1] = {  -- table: 0x127fe1ac0
+--                 isGroup = false,
+--                 index = 2,
+--                 isSelected = true,
+--                 isEnabled = true,
+--                 value = "Tyrannosaurus",
+--             },
+--         },
+--         items = {  -- table: 0x12ad11fb0
+--             [1] = {  -- table: 0x12ad12010
+--                 isGroup = true,
+--                 index = 1,
+--                 isSelected = false,
+--                 isEnabled = false,
+--                 value = "Theropods",
+--             },
+--             [2] = {  -- table: 0x127fe0bc0
+--                 isGroup = false,
+--                 index = 2,
+--                 isSelected = true,
+--                 isEnabled = true,
+--                 value = "Tyrannosaurus",
+--             },
+--             [3] = {  -- table: 0x127fe0c50
+--                 isGroup = false,
+--                 index = 3,
+--                 isSelected = false,
+--                 isEnabled = true,
+--                 value = "Velociraptor",
+--             },
+--             [4] = {  -- table: 0x127fe0d90
+--                 isGroup = false,
+--                 index = 4,
+--                 isSelected = false,
+--                 isEnabled = true,
+--                 value = "Deinonychus",
+--             },
+--             [5] = {  -- table: 0x127fe0e00
+--                 isGroup = true,
+--                 index = 5,
+--                 isSelected = false,
+--                 isEnabled = false,
+--                 value = "Sauropods",
+--             },
+--             [6] = {  -- table: 0x127fdff90
+--                 isGroup = false,
+--                 index = 6,
+--                 isSelected = false,
+--                 isEnabled = true,
+--                 value = "Diplodocus",
+--             },
+--             [7] = {  -- table: 0x127fe1250
+--                 isGroup = false,
+--                 index = 7,
+--                 isSelected = false,
+--                 isEnabled = true,
+--                 value = "Saltasaurus",
+--             },
+--             [8] = {  -- table: 0x127fe12c0
+--                 isGroup = false,
+--                 index = 8,
+--                 isSelected = false,
+--                 isEnabled = true,
+--                 value = "Apatosaurus",
+--             },
+--         },
+--         selectedItemIndexes = {  -- table: 0x127fe1790
+--             [1] = 1,
+--         },
+--         flattenedItems = {  -- table: 0x127fe1440
+--             [1] = "^Theropods",
+--             [2] = "Tyrannosaurus",
+--             [3] = "Velociraptor",
+--             [4] = "Deinonychus",
+--             [5] = "^Sauropods",
+--             [6] = "Diplodocus",
+--             [7] = "Saltasaurus",
+--             [8] = "Apatosaurus",
+--         },
+--         selectedItemCount = 1,
+--     }
+-- ```
+function monkey.get_topmost_formcontrol()
+end
+
+--- 设置处于最前方的表单元素的值
+---@param value string|integer 表单元素值或索引
+function monkey.update_topmost_formcontrol(value)
+end
+
+--- 取消填写处于最前方的表单元素
+function monkey.dismiss_topmost_formcontrol()
+end
+
+--- 关闭所有标签页（仅支持 Safari）
+function monkey.close_all_tabs()
+end
+
+--- 打开无痕浏览模式（仅支持 Safari）
+function monkey.private_browsing_on()
+end
+
+--- 关闭无痕浏览模式（仅支持 Safari）
+function monkey.private_browsing_off()
+end
+
+--- 打开控制台远程调试
+function monkey.remote_inspector_on()
+end
+
+--- 关闭控制台远程调试
+function monkey.remote_inspector_off()
+end
+
+--- 获取控制台远程调试开关状态
+---@return boolean 控制台远程调试开关状态
+function monkey.is_remote_inspector_on()
 end
