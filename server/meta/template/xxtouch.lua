@@ -130,6 +130,22 @@ end
 function screen.ocr_text(left, top, right, bottom, type)
 end
 
+--- 屏幕全屏光学字符搜索（不区分大小写）
+---@param text string 字符串
+---@param type? integer 识别类型，0 表示精确；1 表示模糊，默认为 0
+---@return x integer 横坐标，失败返回 -1
+---@return y integer 纵坐标，失败返回 -1
+function screen.ocr_search(text, type)
+end
+
+--- 屏幕全屏光学字符匹配
+---@param pattern string 匹配样式
+---@param type? integer 识别类型，0 表示精确；1 表示模糊，默认为 0
+---@return x integer 横坐标，失败返回 -1
+---@return y integer 纵坐标，失败返回 -1
+function screen.ocr_match(pattern, type)
+end
+
 --- 在屏幕上寻找条形码或二维码
 ---@param left? integer 横坐标左边界
 ---@param top? integer 纵坐标上边界
@@ -311,6 +327,36 @@ end
 
 ---@class sys*
 sys = {}
+
+--- 获取系统当前语言
+---@return string 当前语言（BCP 47）
+function sys.language()
+end
+
+--- 设置系统当前语言
+---@param language string 当前语言（BCP 47）
+function sys.set_language(language)
+end
+
+--- 获取系统当前区域
+---@return string 当前区域标识符
+function sys.locale()
+end
+
+--- 设置系统当前区域
+---@param locale string 当前区域标识符
+function sys.set_locale(locale)
+end
+
+--- 获取系统当前时区
+---@return string 当前时区标识符
+function sys.timezone()
+end
+
+--- 设置系统当前时区
+---@param timezone string 当前时区标识符
+function sys.set_timezone(timezone)
+end
 
 --- 显示提示文字
 ---@param text string 文字内容
@@ -583,19 +629,19 @@ end
 function app.input_text(text)
 end
 
---- 通过应用程序标志符获取应用的本地化名字
+--- 通过应用程序标识符获取应用的本地化名字
 ---@param appId string App 的应用程序标识符
 ---@return string 应用的本地化名字，如果应用不存在，返回 nil
 function app.localized_name(appId)
 end
 
---- 通过应用程序标志符获取应用的图标数据
+--- 通过应用程序标识符获取应用的图标数据
 ---@param appId string App 的应用程序标识符
 ---@return string 应用的 png 图标数据，如果应用不存在，返回 nil
 function app.png_data_for_bid(appId)
 end
 
---- 通过应用程序标志符获取进程标志符
+--- 通过应用程序标识符获取进程标志符
 ---@param appId string App 的应用程序标识符
 ---@return integer 应用程序进程标志符，如果应用未运行，返回 0
 function app.pid_for_bid(appId)
@@ -1904,4 +1950,188 @@ end
 --- 获取控制台远程调试开关状态
 ---@return boolean 控制台远程调试开关状态
 function monkey.is_remote_inspector_on()
+end
+
+
+--------------------------------------------------------------------------------
+-- 商店助手模块
+--------------------------------------------------------------------------------
+
+---@class appstore*
+appstore = {}
+
+--- 模拟登录 App Store
+---@param username string 用户名
+---@param password string 密码
+---@return boolean 是否登录成功
+---@return string|nil 登录错误信息
+function appstore.login(username, password)
+end
+
+--- 登出 App Store
+function appstore.logout()
+end
+
+--- 获取当前 App Store 用户信息
+---@return table 用户信息
+function appstore.account()
+end
+
+
+--------------------------------------------------------------------------------
+-- 小饼干模块
+--------------------------------------------------------------------------------
+
+---@class cookies*
+cookies = {}
+
+-- 列出所有的 cookie 列表
+---@param id? string 应用程序标识符
+---@return table cookie 列表
+function cookies.list(id)
+end
+
+-- 过滤出指定的 cookie 列表
+---@param filter table 过滤条件
+-- ```lua
+-- list = cookies.filter('/', '.live.com')  -- Path, Domain
+-- list = cookies.filter {
+--     Path = '/',
+--     Domain = '.live.com',
+-- }
+-- ```
+---@param id? string 应用程序标识符
+---@return table cookie 列表
+function cookies.filter(filter, id)
+end
+
+-- 过滤出指定的 cookie 列表
+---@param path string Path
+---@param domain string Domain
+-- ```lua
+-- list = cookies.filter('/', '.live.com')  -- Path, Domain
+-- list = cookies.filter {
+--     Path = '/',
+--     Domain = '.live.com',
+-- }
+-- ```
+---@param id? string 应用程序标识符
+---@return table cookie 列表
+function cookies.filter(path, domain, id)
+end
+
+-- 获取指定名称的 cookie
+---@param filter table 过滤条件
+-- ```lua
+-- tab = cookies.get('MSCC', '/', '.live.com')  -- name, path, domain
+-- tab = cookies.get {
+--     Name = 'MSCC',
+--     Path = '/',
+--     Domain = '.live.com',
+-- }
+-- ```
+---@param id? string 应用程序标识符
+---@return table 单个 cookie
+function cookies.get(filter, id)
+end
+
+-- 获取指定名称的 cookie
+---@param name string Name
+---@param path string Path
+---@param domain string Domain
+-- ```lua
+-- tab = cookies.get('MSCC', '/', '.live.com')  -- Name, Path, Domain
+-- tab = cookies.get {
+--     Name = 'MSCC',
+--     Path = '/',
+--     Domain = '.live.com',
+-- }
+-- ```
+---@param id? string 应用程序标识符
+---@return table 单个 cookie
+function cookies.get(name, path, domain, id)
+end
+
+-- 获取指定名称的 cookie 的值
+---@param filter table 过滤条件
+-- ```lua
+-- value = cookies.value('MSCC', '/', '.live.com')
+-- value = cookies.value {
+--     Name = 'MSCC',
+--     Path = '/',
+--     Domain = '.live.com',
+-- }
+-- ```
+---@param id? string 应用程序标识符
+---@return string cookie 值
+function cookies.value(filter, id)
+end
+
+-- 更新 cookie 列表
+-- 列表中同样 name, path 和 domain 的 cookie 会被替换
+---@param list table cookie 列表
+---@param id? string 应用程序标识符
+---@return boolean 是否更新成功
+---@return string|nil 更新错误信息
+function cookies.update(list, id)
+end
+
+-- 更新单个 cookie
+-- 列表中同样 name, path 和 domain 的 cookie 会被替换
+-- 如果 cookie 不存在，则会创建新的 cookie
+---@param cookie table 单个 cookie
+---@param id? string 应用程序标识符
+---@return boolean 是否更新成功
+---@return string|nil 更新错误信息
+function cookies.update(cookie, id)
+end
+
+-- 设置 cookie 列表
+-- 所有的 cookie 都会被删除，然后再添加
+---@param list table cookie 列表
+---@param id? string 应用程序标识符
+---@return boolean 是否设置成功
+---@return string|nil 设置错误信息
+function cookies.replace(list, id)
+end
+
+-- 删除符合条件的 cookie
+---@param filter table 过滤条件
+-- ```lua
+-- cookies.remove('MSCC', '/', '.live.com')
+-- cookies.remove {
+--     Name = 'MSCC',
+--     Path = '/',
+--     Domain = '.live.com',
+-- }
+-- ```
+---@param id? string 应用程序标识符
+---@return boolean 是否删除成功
+---@return string|nil 删除错误信息
+function cookies.remove(filter, id)
+end
+
+-- 删除符合条件的 cookie
+---@param name string Name，如不指定，置为空字符串
+---@param path string Path，如不指定，置为空字符串
+---@param domain string Domain，如不指定，置为空字符串
+-- ```lua
+-- cookies.remove('MSCC', '/', '.live.com')
+-- cookies.remove {
+--     Name = 'MSCC',
+--     Path = '/',
+--     Domain = '.live.com',
+-- }
+-- ```
+---@param id? string 应用程序标识符
+---@return boolean 是否删除成功
+---@return string|nil 删除错误信息
+function cookies.remove(name, path, domain, id)
+end
+
+-- 清除所有 cookie
+---@param id? string 应用程序标识符
+---@return boolean 是否清除成功
+---@return string|nil 清除错误信息
+function cookies.clear(id)
 end
