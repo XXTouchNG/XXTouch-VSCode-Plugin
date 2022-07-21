@@ -149,7 +149,7 @@ class API {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const res = yield this.axios.get('system/log?last=30');
-                if (res.status === 200) {
+                if (res.status === 200 || res.status === 204 || res.status === 206) {
                     return res.data;
                 }
                 return '';

@@ -127,7 +127,7 @@ function initDeviceView(context) {
         }
         const api = new api_1.API(ip);
         interval = setInterval(() => __awaiter(this, void 0, void 0, function* () {
-            const timestampRegex = /^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]/;
+            const timestampRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \[(TRACE|DEBUG|INFO|NOTICE|WARNING|ERROR|FATAL|ALERT|EMERG)\]/;
             const log = (yield api.getSystemLog()).trim().split('\n');
             let append = false;
             for (const line of log) {
