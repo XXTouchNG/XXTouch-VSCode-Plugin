@@ -21,9 +21,11 @@ const fileView_1 = require("./fileView");
 const infoView_1 = require("./infoView");
 const statusBar_1 = require("./statusBar");
 class Device extends vscode.TreeItem {
-    constructor(ip) {
-        super(ip);
+    constructor(ip, name) {
+        super(name || ip);
+        this.tooltip = ip;
         this.ip = ip;
+        this.name = name;
         this.iconPath = {
             dark: path.join(__filename, '..', '..', '..', 'assets', 'dark', 'device.png'),
             light: path.join(__filename, '..', '..', '..', 'assets', 'light', 'device.png'),
@@ -49,9 +51,15 @@ class DeviceDataProvider {
             return this.devices;
         }
     }
-    addDevice(ip) {
-        this.devices.push(new Device(ip));
+    addDevice(ip, name) {
+        this.devices.find((item) => item.ip === ip) || this.devices.push(new Device(ip, name));
         this.devices.sort((a, b) => {
+            if (a.name && b.name) {
+                return a.name.localeCompare(b.name, undefined, {
+                    numeric: true,
+                    sensitivity: 'base'
+                });
+            }
             const ip = (device) => Number(device.ip
                 .split('.')
                 .map((num) => `000${num}`.slice(-3))
@@ -65,9 +73,14 @@ class DeviceDataProvider {
         client.on('listening', () => {
             client.setBroadcast(true);
             client.on('message', (data, info) => {
-                if (data.toString() === 'touchelf' &&
-                    !this.devices.filter((item) => item.ip === info.address).length) {
-                    this.addDevice(info.address);
+                if (data.toString().startsWith('touchelf') &&
+                    !this.devices.filter((item) => item.ip === info.address).length) 
+                {
+                    if (data.length <= 9) {
+                        this.addDevice(info.address);
+                    } else {
+                        this.addDevice(info.address, data.toString().substring(9));
+                    }
                 }
             });
             client.send('touchelf', 14099, '255.255.255.255');
@@ -84,7 +97,17 @@ class DeviceDataProvider {
         client.bind();
     }
     add(ip) {
-        this.addDevice(ip);
+        const api = new api_1.API(ip);
+        const getDeviceName = () => __awaiter(this, void 0, void 0, function* () { 
+            const state = yield api.appState();
+            if (!state) {
+                return;
+            }
+            return state.system.name;
+        });
+        getDeviceName().then((name) => {
+            this.addDevice(ip, name);
+        });
     }
 }
 exports.currentDevice = '';
