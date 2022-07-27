@@ -3,8 +3,7 @@
 --------------------------------------------------------------------------------
 
 --- 网络日志
----@param msg string 日志内容
-function nLog(msg)
+function nLog(...)
 end
 
 
@@ -524,8 +523,7 @@ function sys.total_disk_space(mountPoint)
 end
 
 --- 输出标准系统日志
----@param message string 日志内容
-function sys.log(message)
+function sys.log(...)
 end
 
 --- 问系统一个问题
