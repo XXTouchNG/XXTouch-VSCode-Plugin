@@ -178,6 +178,10 @@
 				"title": "远程UI"
 			},
 			{
+				"command": "touchelf.device.nlog",
+				"title": "网络日志"
+			},
+			{
 				"command": "touchelf.file.refresh",
 				"title": "刷新",
 				"icon": "$(search-refresh)"
@@ -212,7 +216,7 @@
 		],
 		"keybindings": [
 			{
-				"command": "touchelf.fetch.screen",
+				"command": "touchelf.device.nlog",
 				"key": "F8"
 			}
 		],
@@ -244,6 +248,11 @@
 					"command": "touchelf.device.ui",
 					"when": "view == touchelf-device-view",
 					"group": "navigation@2"
+				},
+				{
+					"command": "touchelf.device.nlog",
+					"when": "view == touchelf-device-view",
+					"group": "navigation@3"
 				},
 				{
 					"command": "touchelf.file.download",

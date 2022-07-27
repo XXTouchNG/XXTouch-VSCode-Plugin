@@ -33,7 +33,7 @@ class Device extends vscode.TreeItem {
         this.command = {
             command: 'touchelf.device.select',
             title: '选择',
-            arguments: [ip],
+            arguments: [this],
         };
     }
 }
@@ -136,19 +136,19 @@ function initDeviceView(context) {
                 }
             });
     });
-    vscode.commands.registerCommand('touchelf.device.select', (ip) => __awaiter(this, void 0, void 0, function* () {
-        exports.currentDevice = ip;
-        statusBar_1.setDeviceStatus(ip);
-        yield infoView_1.infoDataProvider.update(ip);
-        yield fileView_1.fileDataprovider.update(ip);
-        vscode.window.setStatusBarMessage(`切换设备至: ${ip}`, 5000);
+    vscode.commands.registerCommand('touchelf.device.select', (device) => __awaiter(this, void 0, void 0, function* () {
+        exports.currentDevice = device.ip;
+        statusBar_1.setDeviceStatus(device.ip);
+        yield infoView_1.infoDataProvider.update(device.ip);
+        yield fileView_1.fileDataprovider.update(device.ip);
+        vscode.window.setStatusBarMessage(`切换设备至: ${device.ip}`, 5000);
         lastLog = '';
         outputChannel.clear();
         outputChannel.show(true);
         if (interval) {
             clearInterval(interval);
         }
-        const api = new api_1.API(ip);
+        const api = new api_1.API(device.ip);
         interval = setInterval(() => __awaiter(this, void 0, void 0, function* () {
             const timestampRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \[(TRACE|DEBUG|INFO|NOTICE|WARNING|ERROR|FATAL|ALERT|EMERG)\]/;
             const log = (yield api.getSystemLog()).trim().split('\n');
@@ -175,9 +175,25 @@ function initDeviceView(context) {
                 }
             }
         }), 2000);
+        vscode.commands.executeCommand('touchelf.device.nlog', device);
     }));
     vscode.commands.registerCommand('touchelf.device.ui', (device) => {
         vscode.env.openExternal(vscode.Uri.parse(`http://${device.ip}:46952/index.html`));
+    });
+    vscode.commands.registerCommand('touchelf.device.nlog', (device) => {
+        const terminalName = "网络日志 - " + (device.name || device.ip);
+        let terminal = vscode.window.terminals.find((terminal) => terminal.name === terminalName);
+        if (!terminal) {
+            terminal = vscode.window.createTerminal({
+                name: terminalName,
+                hideFromUser: false,
+                shellPath: 'zsh',
+                shellArgs: ['-c', `echo '日志服务已启动：${device.name}（${device.ip}）'; websocat ws://${device.ip}:46957`],
+            });
+        }
+        if (terminal) {
+            terminal.show();
+        }
     });
     function getWebviewContent(context, templatePath) {
         const template = path.join(context.extensionPath, templatePath);
