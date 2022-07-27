@@ -28,14 +28,9 @@ function getDevice() {
     }
 }
 
-function runScript(shouldDebug) {
+function runScript(device, shouldDebug) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const [success, device] = getDevice();
-        if (!success) {
-            return;
-        }
-
         const currentDocument = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document;
         if (!currentDocument) {
             return;
@@ -110,16 +105,38 @@ var isDebugTaskBusy = false;
 function initScript() {
     var _a;
     vscode.commands.registerCommand('touchelf.script.run', () => __awaiter(this, void 0, void 0, function* () {
-        if (isRunTaskBusy || vscode.debug.activeDebugSession !== undefined) {
+        if (isRunTaskBusy || isDebugTaskBusy || vscode.debug.activeDebugSession !== undefined) {
             return;
         }
 
         isRunTaskBusy = true;
-        yield runScript(false);
+
+        const [success, device] = getDevice();
+        if (!success) {
+            isRunTaskBusy = false;
+            return;
+        }
+
+        const api = new api_1.API(device);
+        const isDeviceBusy = () => __awaiter(this, void 0, void 0, function* () {
+            const state = yield api.appState();
+            if (!state) {
+                return false;
+            }
+            return state.script.running;
+        });
+
+        if (yield isDeviceBusy()) {
+            vscode.window.showWarningMessage('设备正在进行其他任务, 请稍后再试');
+            isRunTaskBusy = false
+            return;
+        }
+
+        yield runScript(device, false);
         isRunTaskBusy = false;
     }));
     vscode.commands.registerCommand('touchelf.script.debug', () => __awaiter(this, void 0, void 0, function* () {
-        if (isDebugTaskBusy || vscode.debug.activeDebugSession !== undefined) {
+        if (isDebugTaskBusy || isRunTaskBusy || vscode.debug.activeDebugSession !== undefined) {
             return;
         }
 
@@ -171,7 +188,7 @@ function initScript() {
         
         vscode.debug.startDebugging(activeFolder, 'LuaPanda')
         .then(() => {
-            runScript(true);
+            runScript(device, true);
             isDebugTaskBusy = false;
         });
     }));
