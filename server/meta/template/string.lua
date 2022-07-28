@@ -215,6 +215,26 @@ function string.atrim(s) end
 ---@return string
 function string.strip_utf8_bom(s) end
 
+---#DES 'string.encode_uri'
+---@param s string
+---@return string
+function string.encode_uri(s) end
+
+---#DES 'string.decode_uri'
+---@param s string
+---@return string
+function string.decode_uri(s) end
+
+---#DES 'string.encode_uri_component'
+---@param s string
+---@return string
+function string.encode_uri_component(s) end
+
+---#DES 'string.decode_uri_component'
+---@param s string
+---@return string
+function string.decode_uri_component(s) end
+
 ---#DES 'string.random'
 ---@param pool string
 ---@param length integer

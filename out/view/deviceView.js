@@ -188,7 +188,7 @@ function initDeviceView(context) {
                 name: terminalName,
                 hideFromUser: false,
                 shellPath: 'zsh',
-                shellArgs: ['-c', `echo '日志服务已启动：${device.name}（${device.ip}）'; websocat -0 ws://${device.ip}:46957`],
+                shellArgs: ['-c', `echo '日志服务已启动：${device.name}（${device.ip}）'; websocat --ping-interval 1 --ping-timeout 15 -E -0 ws://${device.ip}:46957`],
             });
         }
         if (terminal) {

@@ -400,6 +400,10 @@ string.rtrim                = 'Returns a string with all trailing white space re
 string.trim                 = 'Returns a string with all leading and trailing white space removed.'
 string.atrim                = 'Returns a string with all white space removed.'
 string.strip_utf8_bom       = 'Returns a string with the UTF-8 BOM removed.'
+string.encode_uri           = 'Encodes a URI by replacing each instance of certain characters by one, two, three, or four escape sequences representing the UTF-8 encoding of the character.'
+string.decode_uri           = 'Decodes a Uniform Resource Identifier (URI) previously created by encode_uri() or by a similar routine.'
+string.encode_uri_component = 'Encodes a URI by replacing each instance of certain characters by one, two, three, or four escape sequences representing the UTF-8 encoding of the character.'
+string.decode_uri_component = 'Decodes a Uniform Resource Identifier (URI) previously created by encode_uri_component() or by a similar routine.'
 string.random               = 'Returns a string with `n` random characters.'
 string.compare_version      = 'Compare two version numbers, Version number A is greater than version number B returns 1, version number A is less than version number B returns -1, version number equal returns 0.'
 
