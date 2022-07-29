@@ -578,19 +578,25 @@ app = {}
 
 --- 获取 App 的应用程序包路径
 ---@param appId string App 的应用程序标识符
----@return string App 的应用程序包路径，如果应用不存在，返回 nil
+---@return string 应用程序包路径，如果应用不存在，返回 nil
 function app.bundle_path(appId)
+end
+
+--- 获取 App 的应用程序版本
+---@param appId string App 的应用程序标识符
+---@return string 应用程序版本，如果应用不存在，返回 nil
+function app.bundle_version(appId)
 end
 
 --- 获取 App 的应用存档路径
 ---@param appId string App 的应用程序标识符
----@return string App 的应用存档路径，如果应用不存在，返回 nil
+---@return string 应用存档路径，如果应用不存在，返回 nil
 function app.data_path(appId)
 end
 
 --- 获取 App 的应用分组信息
 ---@param appId string App 的应用程序标识符
----@return table App 的应用分组信息，如果没有分组信息，返回 nil
+---@return table 应用分组信息，如果没有分组信息，返回 nil
 function app.group_info(appId)
 end
 
