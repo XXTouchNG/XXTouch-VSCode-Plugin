@@ -119,30 +119,50 @@ function screen.image(left, top, right, bottom)
 end
 
 --- 屏幕区域光学字符识别
+---@param options? table 识别选项
+-- ```lua
+-- screen.ocr_text {
+--     left = 0,
+--     top = 0,
+--     right = 300,
+--     bottom = 300,
+--     level = 'ACCURATE',  -- ACCURATE 精确 FAST 快速
+--     languages = { 'en-US', 'zh-Hans' },  -- 支持的语言代码
+--     words = { 'Chrome', 'Firefox', 'Edge', 'Opera' },  -- 备选词汇表
+--     confidence = 0.8,  -- 最小可信度，低于此数值的结果将被丢弃
+--     timeout = 3000,  -- 超时时间，单位毫秒
+-- }
+-- ```
+---@return table 识别结果字符串列表
+---@return table 识别结果详情，包括识别到的区域坐标
+function screen.ocr_text(options)
+end
+
+--- 屏幕区域光学字符识别
 ---@param left? integer 横坐标左边界
 ---@param top? integer 纵坐标上边界
 ---@param right? integer 横坐标右边界
 ---@param bottom? integer 纵坐标下边界
----@param type? integer 识别类型，0 表示精确；1 表示模糊，默认为 0
+---@param level? integer 识别类型，0 表示精确；1 表示快速，默认为 0
 ---@return table 识别结果字符串列表
 ---@return table 识别结果详情，包括识别到的区域坐标
-function screen.ocr_text(left, top, right, bottom, type)
+function screen.ocr_text(left, top, right, bottom, level)
 end
 
 --- 屏幕全屏光学字符搜索（不区分大小写）
 ---@param text string 字符串
----@param type? integer 识别类型，0 表示精确；1 表示模糊，默认为 0
+---@param level? integer 识别类型，0 表示精确；1 表示快速，默认为 0
 ---@return x integer 横坐标，失败返回 -1
 ---@return y integer 纵坐标，失败返回 -1
-function screen.ocr_search(text, type)
+function screen.ocr_search(text, level)
 end
 
 --- 屏幕全屏光学字符匹配
 ---@param pattern string 匹配样式
----@param type? integer 识别类型，0 表示精确；1 表示模糊，默认为 0
+---@param level? integer 识别类型，0 表示精确；1 表示快速，默认为 0
 ---@return x integer 横坐标，失败返回 -1
 ---@return y integer 纵坐标，失败返回 -1
-function screen.ocr_match(pattern, type)
+function screen.ocr_match(pattern, level)
 end
 
 --- 在屏幕上寻找条形码或二维码
