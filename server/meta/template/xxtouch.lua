@@ -919,8 +919,34 @@ function device.assistive_touch_off()
 end
 
 --- 判断 AssistiveTouch 是否打开
----@return boolean AssistiveTouch 是否打开，true 表示打开，false 表示关闭
+---@return boolean 是否打开，true 表示打开，false 表示关闭
 function device.is_assistive_touch_on()
+end
+
+--- 打开位置服务
+function device.location_services_on()
+end
+
+--- 关闭位置服务
+function device.location_services_off()
+end
+
+--- 判断位置服务是否打开
+---@return boolean 是否打开，true 表示打开，false 表示关闭
+function device.is_location_services_on()
+end
+
+--- 允许应用弹框要求授予跟踪权限
+function device.tracking_on()
+end
+
+--- 禁止应用弹框要求授予跟踪权限
+function device.tracking_off()
+end
+
+--- 检查是否允许应用弹框要求授予跟踪权限
+---@return boolean 是否允许，true 表示允许，false 表示禁止
+function device.is_tracking_on()
 end
 
 --- 获取背光亮度值
