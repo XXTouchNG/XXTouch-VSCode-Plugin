@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>屏幕抓抓</title>
+
+  <script src="react.production.min.js"></script>
+  <script src="react-dom.production.min.js"></script>
+  <script src="babel.min.js"></script>
+  <script src="antd.min.js"></script>
+  <script src="jimp.min.js"></script>
+  <link rel="stylesheet" href="antd.dark.min.css" />
+  <link rel="stylesheet" href="material-icons.min.css" />
+
+  <style>
+    body {
+      padding: 0;
+    }
+
+    .icon {
+      font-size: inherit;
+      vertical-align: middle;
+    }
+
+    .left {
+      height: 100vh;
+      width: 348px !important;
+      min-width: 348px !important;
+      overflow: auto;
+      position: fixed;
+      left: 0;
+    }
+
+    .crop {
+      height: 203px;
+      width: 203px;
+      border: solid 1px #303030;
+      content: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMkAAADJBAMAAAB76As2AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAD1BMVEX/////AAAAAP//AAD///8Rbtx7AAAAAnRSTlMAAHaTzTgAAAABYktHRACIBR1IAAAAB3RJTUUH5AULFBsZiJKTswAAAAFvck5UAc+id5oAAABSSURBVHja7c9RCcAwDEDBMgWrgxAFK/XvbRr20RHCnYHHGwMAAAAAAAAAAKCcUClZ6WQ1qWSOvZ8r43Rorvv4zF+VVkKlZAUAAAAAAAAAAOCTF/KMAyXmz4bGAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIwLTA1LTExVDIwOjI1OjI4KzAwOjAwNTlOqAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMC0wNS0xMVQyMDoyNToyOCswMDowMERk9hQAAAAZdEVYdFNvZnR3YXJlAEFkb2JlIEltYWdlUmVhZHlxyWU8AAAAAElFTkSuQmCC');
+    }
+
+    .right {
+      margin-left: 348px;
+    }
+
+    .header {
+      position: fixed;
+      width: 100%;
+      height: 32px;
+      background: black;
+    }
+
+    .content {
+      margin-top: 32px;
+      padding-bottom: 10px;
+      overflow-x: scroll;
+    }
+
+    .img {
+      max-width: none;
+      max-height: none;
+    }
+
+    .font-preview-container {
+      border: 1px solid #434343;
+      height: 32px;
+      width: 100%;
+    }
+
+    .font-preview {
+      height: 100%;
+      width: 100%;
+      object-fit: contain;
+    }
+
+    .rubberband {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border: 1px dashed blue;
+      background: blue;
+      opacity: 0.3;
+    }
+  </style>
+
+  <script type="text/babel">
+    const {
+      Row,
+      Col,
+      Collapse,
+      Layout,
+      Space,
+      Menu,
+      Modal,
+      Select,
+      Tabs,
+      Divider,
+      Table,
+      Input,
+      Button,
+      Dropdown,
+      message,
+    } = antd
+    const { Header, Content, Footer, Sider } = Layout
+    const { Panel } = Collapse
+    const { TextArea } = Input
+    const { Option } = Select
+    const { TabPane } = Tabs
+
+    const vscode = acquireVsCodeApi()
+
+    window.onload = () => {
+      const app = document.querySelector('#app')
+      ReactDOM.render(<App />, app)
+    }
+
+    document.body.addEventListener('contextmenu', (e) => {
+      e.preventDefault() // cancel the built-in context menu
+    })
+
+    function colorHex(color) {
+      return (
+        '0x' +
+        `00000000${color.toString(16).slice(0, -2).toUpperCase()}`.slice(-6)
+      )
+    }
+
+    function copyText(text) {
+      vscode.postMessage({ command: 'copy', payload: text })
+      message.info(
+        `${text.slice(0, 30)}${text.length > 30 ? '...' : ''} 已复制到剪贴板`
+      )
+    }
+
+    function simpleRotate(jimp, deg) {
+      function rotate90degrees(bitmap, dstBuffer, clockwise) {
+        const dstOffsetStep = clockwise ? -4 : 4
+        let dstOffset = clockwise ? dstBuffer.length - 4 : 0
+
+        let tmp
+        let x
+        let y
+        let srcOffset
+
+        for (x = 0; x < bitmap.width; x++) {
+          for (y = bitmap.height - 1; y >= 0; y--) {
+            srcOffset = (bitmap.width * y + x) << 2
+            tmp = bitmap.data.readUInt32BE(srcOffset, true)
+            dstBuffer.writeUInt32BE(tmp, dstOffset, true)
+            dstOffset += dstOffsetStep
+          }
+        }
+      }
+
+      let steps = Math.round(deg / 90) % 4
+      steps += steps < 0 ? 4 : 0
+
+      if (steps === 0) {
+        return jimp
+      }
+
+      const srcBuffer = jimp.bitmap.data
+      const len = srcBuffer.length
+      const dstBuffer = Buffer.allocUnsafe(len)
+
+      let tmp
+
+      if (steps === 2) {
+        // Upside-down
+        for (let srcOffset = 0; srcOffset < len; srcOffset += 4) {
+          tmp = srcBuffer.readUInt32BE(srcOffset, true)
+          dstBuffer.writeUInt32BE(tmp, len - srcOffset - 4, true)
+        }
+      } else {
+        // Clockwise or counter-clockwise rotation by 90 degree
+        rotate90degrees(jimp.bitmap, dstBuffer, steps === 1)
+
+        tmp = jimp.bitmap.width
+        jimp.bitmap.width = jimp.bitmap.height
+        jimp.bitmap.height = tmp
+      }
+
+      jimp.bitmap.data = dstBuffer
+      return jimp
+    }
+
+    function CursorInfo(props) {
+      const { crop, cursor } = props
+      const columns = [
+        {
+          dataIndex: 'name',
+          align: 'right',
+          width: '50px',
+        },
+        {
+          dataIndex: 'value',
+          width: '90px',
+          render: (text, record, index) => {
+            if (index === 3) {
+              return {
+                props: {
+                  style: {
+                    background: `#${text.slice(2)}`,
+                  },
+                },
+              }
+            } else {
+              return text
+            }
+          },
+        },
+      ]
+      const dataSource = [
+        {
+          name: 'X',
+          value: cursor.x,
+        },
+        {
+          name: 'Y',
+          value: cursor.y,
+        },
+        {
+          name: '颜色',
+          value: cursor.c,
+        },
+        {
+          name: '预览',
+          value: cursor.c,
+        },
+      ]
+
+      return (
+        <div>
+          <Divider style={{ margin: '0 0 5px 0' }} orientation="left" plain>
+            <i class="material-icons icon">gps_fixed</i> 光标信息
+          </Divider>
+          <Row>
+            <Col span={14}>
+              <img
+                className="crop"
+                style={crop ? { backgroundImage: `url(${crop})` } : {}}
+                alt=""
+              />
+            </Col>
+            <Col span={10}>
+              <Table
+                showHeader={false}
+                bordered={true}
+                size="small"
+                pagination={false}
+                dataSource={dataSource}
+                columns={columns}
+              />
+            </Col>
+          </Row>
+        </div>
+      )
+    }
+
+    function ColorRecord(props) {
+      const { colors } = props
+      const columns = [
+        {
+          title: '坐标',
+          dataIndex: 'position',
+          onCell: (record) => {
+            return {
+              onClick: () => {
+                if (record.c) {
+                  copyText(record.position)
+                }
+              },
+            }
+          },
+        },
+        {
+          title: '颜色',
+          width: '90px',
+          dataIndex: 'c',
+          onCell: (record) => {
+            return {
+              onClick: () => {
+                if (record.c) {
+                  copyText(record.c)
+                }
+              },
+            }
+          },
+        },
+        {
+          title: '预览',
+          width: '50px',
+          dataIndex: 'preview',
+          render: (text, record, index) => {
+            return {
+              props: {
+                style: {
+                  background: `#${text.slice(2)}`,
+                },
+              },
+            }
+          },
+        },
+        {
+          title: '热键',
+          width: '60px',
+          dataIndex: 'hotkey',
+        },
+      ]
+      return (
+        <div>
+          <Divider
+            style={{ margin: '10px 0 5px 0' }}
+            orientation="left"
+            plain
+          >
+            <i class="material-icons icon">colorize</i> 颜色记录
+          </Divider>
+          <Table
+            size="small"
+            bordered={true}
+            pagination={false}
+            dataSource={colors}
+            columns={columns}
+          />
+        </div>
+      )
+    }
+
+    function Binarization(props) {
+      const { jimp, onBinarization, onReset, cursor, done } = props
+      const [colors, setColors] = React.useState('0xFFFFFF')
+      const [fuzzy, setFuzzy] = React.useState(90)
+
+      React.useEffect(() => {
+        function onKeyDown(e) {
+          if (e.key == '`') {
+            if (colors.trim().endsWith(',')) {
+              setColors(`${colors.trim().slice(0, -1)},${cursor.c}`)
+            } else {
+              const tmp = colors.trim().split(',')
+              tmp.pop()
+              tmp.push(cursor.c)
+              setColors(tmp.join(','))
+            }
+          }
+        }
+        window.addEventListener('keydown', onKeyDown)
+        return () => {
+          window.removeEventListener('keydown', onKeyDown)
+        }
+      })
+
+      function onColorsChange(e) {
+        setColors(e.target.value)
+      }
+
+      function onFuzzyChange(e) {
+        setFuzzy(e.target.value)
+      }
+
+      function onStart() {
+        const _colors = colors
+          .split(',')
+          .map((item) => Jimp.intToRGBA(parseInt(item.trim() + 'ff')))
+        const _fuzzy = parseInt(fuzzy)
+        const copy = jimp.clone()
+        copy.scan(
+          0,
+          0,
+          jimp.bitmap.width,
+          jimp.bitmap.height,
+          (x, y, index) => {
+            const r = copy.bitmap.data[index + 0]
+            const g = copy.bitmap.data[index + 1]
+            const b = copy.bitmap.data[index + 2]
+            if (
+              _colors.some((item) => {
+                if (_fuzzy === 100) {
+                  return item.r === r && item.g === g && item.b === b
+                } else {
+                  const diff =
+                    Math.sqrt(
+                      Math.pow(item.r - r, 2) +
+                      Math.pow(item.g - g, 2) +
+                      Math.pow(item.b - b, 2)
+                    ) /
+                    Math.sqrt(
+                      Math.pow(255, 2) + Math.pow(255, 2) + Math.pow(255, 2)
+                    )
+                  return (1 - diff) * 100 > _fuzzy
+                }
+              })
+            ) {
+              copy.setPixelColor(0x000000ff, x, y)
+            } else {
+              copy.setPixelColor(0xffffffff, x, y)
+            }
+          }
+        )
+        onBinarization(copy, colors, fuzzy)
+      }
+
+      return (
+        <div>
+          <Divider
+            style={{ margin: '10px 0 5px 0' }}
+            orientation="left"
+            plain
+          >
+            <i class="material-icons icon">filter_b_and_w</i> 二值化
+          </Divider>
+          <Row>
+            <Col span={10}>
+              <Input
+                value={colors}
+                onChange={onColorsChange}
+                placeHolder="颜色过滤"
+              ></Input>
+            </Col>
+            <Col span={6}>
+              <Input
+                value={fuzzy}
+                onChange={onFuzzyChange}
+                placeHolder="精度"
+              ></Input>
+            </Col>
+            <Col span={4}>
+              <Button
+                style={{ width: '100%' }}
+                onClick={onStart}
+                disabled={done}
+              >
+                开始
+              </Button>
+            </Col>
+            <Col span={4}>
+              <Button
+                style={{ width: '100%' }}
+                onClick={onReset}
+                disabled={!done}
+              >
+                重置
+              </Button>
+            </Col>
+          </Row>
+        </div>
+      )
+    }
+
+    function CodeTemplate(props) {
+      const { template, visible, onSave, onCancel } = props
+      const [value, setValue] = React.useState(template)
+
+      React.useEffect(() => {
+        setValue(template)
+      }, [template])
+
+      function onChange(index) {
+        return (e) => {
+          let copy = [...value]
+          copy[index] = e.target.value
+          setValue(copy)
+        }
+      }
+
+      const columns = [
+        {
+          title: '变量',
+          dataIndex: 'name',
+        },
+        {
+          title: '说明',
+          dataIndex: 'note',
+        },
+      ]
+      const dataSource = [
+        {
+          name: '\$pointInitList',
+          note: '原始点列表',
+        },
+        {
+          name: '\$pointList',
+          note: '相对点列表',
+        },
+        {
+          name: '\$xMin',
+          note: '最小横坐标',
+        },
+        {
+          name: '\$yMin',
+          note: '最小纵坐标',
+        },
+        {
+          name: '\$xMax',
+          note: '最大横坐标',
+        },
+        {
+          name: '\$yMax',
+          note: '最大纵坐标',
+        },
+        {
+          name: '\$xFirst',
+          note: '起始横坐标',
+        },
+        {
+          name: '\$yFirst',
+          note: '起始纵坐标',
+        },
+        {
+          name: '\$point[n].x',
+          note: '第 n 个点的横坐标',
+        },
+        {
+          name: '\$point[n].y',
+          note: '第 n 个点的纵坐标',
+        },
+        {
+          name: '\$point[n].c',
+          note: '第 n 个点的颜色值',
+        },
+        {
+          name: '\$record[n].x',
+          note: '第 n 个颜色记录的横坐标',
+        },
+        {
+          name: '\$record[n].y',
+          note: '第 n 个颜色记录的纵坐标',
+        },
+        {
+          name: '\$record[n].c',
+          note: '第 n 个颜色记录的颜色值',
+        },
+      ]
+
+      return (
+        <Modal
+          title="模板设置"
+          visible={visible}
+          onOk={() => {
+            onSave(value)
+          }}
+          onCancel={() => {
+            setValue(template)
+            onCancel()
+          }}
+          okText="保存"
+          cancelText="取消"
+        >
+          <Tabs defaultActiveKey="1" size="small" centered>
+            {value.map((item, index) => {
+              return (
+                <TabPane tab={`模板${index + 1}`} key={`${index}`}>
+                  <TextArea
+                    rows={4}
+                    value={value[index]}
+                    onChange={onChange(index)}
+                  />
+                </TabPane>
+              )
+            })}
+          </Tabs>
+          <Collapse style={{ marginTop: 10 }} ghost>
+            <Panel header="帮助" key="1">
+              <Table
+                style={{ marginTop: 10 }}
+                showHeader={true}
+                bordered={true}
+                size="small"
+                pagination={false}
+                dataSource={dataSource}
+                columns={columns}
+              />
+            </Panel>
+          </Collapse>
+        </Modal>
+      )
+    }
+
+    function CodeGenerator(props) {
+      const { colors, record, onClear, onPop } = props
+      const [templateVisible, setTemplateVisible] = React.useState(false)
+      const [template, setTemplate] = React.useState({
+        active: '1',
+        template: [
+          '\$pointList',
+          'if (screen.is_colors(\$pointList, 90.0)) then',
+          'x, y = screen.find_color(\$pointList, 90.0)',
+          '\$record[1].x',
+          '\$record[1].y',
+        ],
+      })
+
+      React.useEffect(() => {
+        window.addEventListener('message', async (event) => {
+          const message = event.data
+          if (message.command === 'loadTemplate') {
+            if (message.payload) {
+              if (typeof message.payload === 'object') {
+                setTemplate(message.payload)
+              }
+            }
+          }
+        })
+        vscode.postMessage({ command: 'loadTemplate' })
+      }, [])
+
+      function onTemplateActiveChange(value) {
+        const newTemplate = { active: value, template: template.template }
+        setTemplate(newTemplate)
+        vscode.postMessage({
+          command: 'saveTemplate',
+          payload: newTemplate,
+        })
+      }
+
+      function onTemplateShow() {
+        setTemplateVisible(true)
+      }
+
+      function onTemplateSave(value) {
+        setTemplateVisible(false)
+        const newTemplate = { active: template.active, template: value }
+        setTemplate(newTemplate)
+        vscode.postMessage({
+          command: 'saveTemplate',
+          payload: newTemplate,
+        })
+      }
+
+      function onTemplateCancel() {
+        setTemplateVisible(false)
+      }
+
+      function onGenerate(index) {
+        if (!colors.length) {
+          return
+        }
+
+        const { x, y, c } = colors[0]
+        const xs = colors.map((v) => v.x)
+        const ys = colors.map((v) => v.y)
+        const xMin = Math.min(...xs)
+        const xMax = Math.max(...xs)
+        const yMin = Math.min(...ys)
+        const yMax = Math.max(...ys)
+        const xFirst = x
+        const yFirst = y
+
+        const pointInitList = '{\n' + colors
+          .map((item) => `  {${item.x}, ${item.y}, ${item.c}}`)
+          .join(',\n') + '\n}'
+        const pointList = '{\n' + colors
+          .map((item) => `  {${item.x - x}, ${item.y - y}, ${item.c}}`)
+          .join(',\n') + '\n}'
+
+        if (!index) {
+          index = parseInt(template.active) - 1
+        } else {
+          index = index - 1
+        }
+        let code = template.template[index]
+          .replace(/\$pointInitList/g, pointInitList)  // 绝对点顺序表
+          .replace(/\$pointList/g, pointList)          // 相对点顺序表
+          .replace(/\$xMin/g, xMin)
+          .replace(/\$xMax/g, xMax)
+          .replace(/\$yMin/g, yMin)
+          .replace(/\$yMax/g, yMax)
+          .replace(/\$xFirst/g, xFirst)
+          .replace(/\$yFirst/g, yFirst)
+        colors.forEach((value, index) => {
+          code = code
+            .replace(`\$point[${index + 1}].x`, value.x)
+            .replace(`\$point[${index + 1}].y`, value.y)
+            .replace(`\$point[${index + 1}].c`, value.c)
+        })
+        record.forEach((value, index) => {
+          if (value.c) {
+            code = code
+              .replace(`\$record[${index + 1}].x`, value.x)
+              .replace(`\$record[${index + 1}].y`, value.y)
+              .replace(`\$record[${index + 1}].c`, value.c)
+          }
+        })
+
+        copyText(code)
+      }
+      React.useEffect(() => {
+        function onKeyDown(e) {
+          if (e.key === '!') {
+            onGenerate(1)
+          } else if (e.key === '@') {
+            onGenerate(2)
+          } else if (e.key === '#') {
+            onGenerate(3)
+          } else if (e.key === '$') {
+            onGenerate(4)
+          } else if (e.key === '%') {
+            onGenerate(5)
+          }
+        }
+        window.addEventListener('keydown', onKeyDown)
+        return () => {
+          window.removeEventListener('keydown', onKeyDown)
+        }
+      })
+
+      return (
+        <div>
+          <Row>
+            <Col span={16}>
+              <Select
+                style={{ width: '100%' }}
+                value={template.active}
+                onChange={onTemplateActiveChange}
+              >
+                {template.template.map((value, index) => {
+                  return (
+                    <Option value={`${index + 1}`}>{`模版${index + 1
+                      }`}</Option>
+                  )
+                })}
+              </Select>
+            </Col>
+            <Col span={4}>
+              <Button style={{ width: '100%' }} onClick={onTemplateShow}>
+                设置
+              </Button>
+            </Col>
+            <Col span={4}>
+              <Button
+                style={{ width: '100%' }}
+                type="primary"
+                onClick={() => {
+                  onGenerate(0)
+                }}
+                disabled={colors.length === 0}
+              >
+                生成
+              </Button>
+            </Col>
+          </Row>
+          <CodeTemplate
+            template={template.template}
+            visible={templateVisible}
+            onSave={onTemplateSave}
+            onCancel={onTemplateCancel}
+          />
+          <TextArea
+            value={colors
+              .map(
+                (item, index) =>
+                  `点[${index + 1}]:  (${item.x},${item.y})  ${item.c}`
+              )
+              .reverse()
+              .join('\n')}
+            rows={4}
+            readOnly
+            placeHolder="按0记录点用于代码生成"
+          />
+          <Row>
+            <Col span={12}>
+              <Button
+                style={{ width: '100%' }}
+                onClick={onClear}
+                disabled={colors.length === 0}
+              >
+                清空
+              </Button>
+            </Col>
+            <Col span={12}>
+              <Button
+                style={{ width: '100%' }}
+                onClick={onPop}
+                disabled={colors.length === 0}
+              >
+                撤销
+              </Button>
+            </Col>
+          </Row>
+        </div>
+      )
+    }
+
+    function FontLib(props) {
+      const { binarization, onSelect } = props
+      const [fonts, setFonts] = React.useState([])
+
+      function onTextChange(index) {
+        return (e) => {
+          const copy = [...fonts]
+          copy[index].text = e.target.value
+          setFonts(copy)
+        }
+      }
+
+      const onClick = (index) => {
+        return () => {
+          onSelect((data) => {
+            const copy = [...fonts]
+            copy[index].data = data
+            setFonts(copy)
+          })
+        }
+      }
+
+      const onDelete = (index) => {
+        return () => {
+          const copy = [...fonts]
+          copy.splice(index, 1)
+          setFonts(copy)
+        }
+      }
+
+      function onAdd() {
+        if (!binarization.done) {
+          message.error('请先调整二值化参数至要找的字清晰')
+          return
+        }
+        setFonts([
+          ...fonts,
+          {
+            text: '',
+            data: '',
+            colors: binarization.colors
+              .split(',')
+              .map((item) => item.trim())
+              .join(', '),
+            fuzzy: binarization.fuzzy,
+          },
+        ])
+      }
+
+      function onGenerate() {
+        if (fonts.some((item) => !item.text || !item.data)) {
+          message.error('键值不能为空')
+          return
+        }
+        const table = fonts
+          .map(
+            (item) =>
+              `  {'${item.text}', {${item.colors}}, ${item.fuzzy}, '${item.data}'}`
+          )
+          .join(', \n')
+        const code = `{\n${table}\n}`
+        copyText(code)
+      }
+
+      return (
+        <div>
+          {fonts.map((item, index) => (
+            <Row>
+              <Col span={4}>
+                <Input
+                  placeHolder="字键"
+                  value={item.text}
+                  onChange={onTextChange(index)}
+                ></Input>
+              </Col>
+              <Col span={2}>
+                <div className="font-preview-container">
+                  <img
+                    className="font-preview"
+                    src={
+                      'data:image/png;base64,' +
+                      (item.data
+                        ? item.data
+                        : 'iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKAQMAAAC3/F3+AAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAANQTFRF////p8QbyAAAAAtJREFUeJxjYMAHAAAeAAH2/emWAAAAAElFTkSuQmCC')
+                    }
+                    alt=""
+                  />
+                </div>
+              </Col>
+              <Col span={14}>
+                <Input
+                  placeHolder="字值 (点击后框选文字)"
+                  readOnly
+                  value={item.data}
+                  onClick={onClick(index)}
+                ></Input>
+              </Col>
+              <Col span={4}>
+                <Button type="danger" onClick={onDelete(index)}>
+                  删除
+                </Button>
+              </Col>
+            </Row>
+          ))}
+          <Button block onClick={onAdd}>
+            添加
+          </Button>
+          <Button
+            disabled={fonts.length === 0}
+            block
+            type="primary"
+            onClick={onGenerate}
+          >
+            生成
+          </Button>
+        </div>
+      )
+    }
+
+    function App() {
+      const [image, setImage] = React.useState({
+        jimp: null,
+        base64: '',
+        deg: 0,
+      })
+      const [binarization, setBinarization] = React.useState({
+        backup: null,
+        colors: [],
+        fuzzy: 0,
+      })
+      const [crop, setCrop] = React.useState('')
+      const [cursor, setCursor] = React.useState({
+        x: -1,
+        y: -1,
+        c: '0x000000',
+      })
+      const [cut, setCut] = React.useState({
+        enabled: false,
+        clientX: -1,
+        clientY: -1,
+        imageX: -1,
+        imageY: -1,
+        div: null,
+        callback: (data) => { },
+      })
+      const [colorRecord, setColorRecord] = React.useState(
+        [1, 2, 3, 4, 5].map((value) => ({
+          position: '',
+          x: -1,
+          y: -1,
+          c: '',
+          preview: '',
+          hotkey: `数字${value}`,
+        }))
+      )
+      const [colorGenerator, setColorGenerator] = React.useState([])
+      const contentRef = React.useRef(null)
+
+      async function initImage(jimp, deg) {
+        setImage({
+          jimp: jimp,
+          base64: await jimp.getBase64Async(Jimp.MIME_PNG),
+          deg: deg,
+        })
+      }
+
+      React.useEffect(() => {
+        async function onMessage(event) {
+          const message = event.data
+          if (message.command === 'init') {
+            setBinarization({
+              backup: null,
+              colors: [],
+              fuzzy: 0,
+            })
+            initImage(
+              simpleRotate(
+                await Jimp.read(Buffer.from(message.payload, 'base64')),
+                image.deg
+              ),
+              image.deg
+            )
+          }
+        }
+        window.addEventListener('message', onMessage)
+        return () => {
+          window.removeEventListener('message', onMessage)
+        }
+      })
+
+      React.useEffect(() => {
+        resetCrop()
+        vscode.postMessage({ command: 'init' })
+      }, [])
+
+      function addCodeGenerator() {
+        if (cursor.x !== -1 && cursor.y !== -1) {
+          setColorGenerator([
+            ...colorGenerator,
+            {
+              x: cursor.x,
+              y: cursor.y,
+              c: cursor.c,
+            },
+          ])
+        }
+      }
+
+      React.useEffect(() => {
+        function setRecord(n) {
+          if (cursor.x !== -1 && cursor.y !== -1) {
+            const copy = [...colorRecord]
+            copy[n - 1].position = `${cursor.x},${cursor.y}`
+            copy[n - 1].x = cursor.x
+            copy[n - 1].y = cursor.y
+            copy[n - 1].c = cursor.c
+            copy[n - 1].preview = cursor.c
+            setColorRecord(copy)
+          }
+        }
+
+        function onKeyDown(e) {
+          if (['1', '2', '3', '4', '5'].includes(e.key)) {
+            setRecord(parseInt(e.key))
+          } else if (e.key === '0' || e.key == ')') {
+            addCodeGenerator()
+          } else if (e.key == 'W') {
+            updateCursor(cursor.x, cursor.y - 1)
+          } else if (e.key == 'S') {
+            updateCursor(cursor.x, cursor.y + 1)
+          } else if (e.key == 'A') {
+            updateCursor(cursor.x - 1, cursor.y)
+          } else if (e.key == 'D') {
+            updateCursor(cursor.x + 1, cursor.y)
+          }
+        }
+
+        window.addEventListener('keydown', onKeyDown)
+
+        return () => {
+          window.removeEventListener('keydown', onKeyDown)
+        }
+      })
+
+      function resetCrop() {
+        new Jimp(203, 203, 0x000000ff, (_, crop) => {
+          crop.getBase64(Jimp.MIME_PNG, (_, v) => {
+            setCrop(v)
+          })
+        })
+      }
+
+      function updateCursor(x, y) {
+        x = Math.round(x)
+        y = Math.round(y)
+        if (
+          x < 0 ||
+          y < 0 ||
+          x >= image.jimp.bitmap.width ||
+          y >= image.jimp.bitmap.height
+        ) {
+          return
+        }
+        setCursor({
+          x: x,
+          y: y,
+          c: colorHex(image.jimp.getPixelColor(x, y)),
+        })
+
+        new Jimp(11, 11, 0x000000ff, (_, crop) => {
+          for (let i = -5; i <= 5; ++i) {
+            for (let j = -5; j <= 5; ++j) {
+              const x1 = x + i
+              const y1 = y + j
+              if (
+                x1 >= 0 &&
+                x1 < image.jimp.bitmap.width &&
+                y1 >= 0 &&
+                y1 < image.jimp.bitmap.height
+              ) {
+                crop.setPixelColor(
+                  image.jimp.getPixelColor(x1, y1),
+                  i + 5,
+                  j + 5
+                )
+              }
+            }
+          }
+          crop
+            .resize(203, 203, Jimp.RESIZE_NEAREST_NEIGHBOR)
+            .getBase64(Jimp.MIME_PNG, (_, v) => {
+              setCrop(v)
+            })
+        })
+      }
+
+      function onMouseDown(e) {
+        if (!cut.enabled) {
+          switch (e.nativeEvent.which) {
+            case 1:
+              addCodeGenerator()
+              break
+            case 3:
+              onCodeGeneratorPop()
+              break
+          }
+          return
+        }
+        const clientX = e.clientX + contentRef.current.scrollLeft
+        const clientY = e.clientY + window.pageYOffset
+
+        const div = document.createElement('div')
+        div.className = 'rubberband'
+        div.style.left = `${e.clientX}px`
+        div.style.top = `${clientY}px`
+        contentRef.current.appendChild(div)
+
+        setCut({
+          ...cut,
+          enabled: false,
+          clientX: e.clientX,
+          clientY: clientY,
+          imageX: cursor.x,
+          imageY: cursor.y,
+          div: div,
+        })
+      }
+
+      function onMouseMove(e) {
+        const clientX = e.clientX + contentRef.current.scrollLeft
+        const clientY = e.clientY + window.pageYOffset
+
+        updateCursor(
+          clientX - e.target.offsetLeft,
+          clientY - e.target.offsetTop
+        )
+
+        if (cut.div) {
+          cut.div.style.left = `${Math.min(e.clientX, cut.clientX)}px`
+          cut.div.style.top = `${Math.min(clientY, cut.clientY)}px`
+          cut.div.style.width = `${Math.abs(cut.clientX - e.clientX)}px`
+          cut.div.style.height = `${Math.abs(cut.clientY - clientY)}px`
+        }
+      }
+
+      function onMouseUp() {
+        if (cut.div) {
+          cut.div.parentElement.removeChild(cut.div)
+          cut.div = null
+          const x = Math.min(cursor.x, cut.imageX)
+          const y = Math.min(cursor.y, cut.imageY)
+          const w = Math.abs(cursor.x - cut.imageX)
+          const h = Math.abs(cursor.y - cut.imageY)
+
+          cut.callback(image.jimp.clone().crop(x, y, w, h))
+        }
+      }
+
+      function onMouseLeave() {
+        if (!cut.div) {
+          setCursor({
+            x: -1,
+            y: -1,
+            c: '0x000000',
+          })
+
+          resetCrop()
+        }
+      }
+
+      function onBinarization(jimp, colors, fuzzy) {
+        if (!binarization.backup) {
+          setBinarization({
+            ...binarization,
+            backup: image,
+            colors: colors,
+            fuzzy: fuzzy,
+          })
+          initImage(jimp, image.deg)
+        }
+      }
+
+      function onReset() {
+        if (binarization.backup) {
+          initImage(
+            simpleRotate(
+              binarization.backup.jimp.clone(),
+              360 - binarization.backup.deg + image.deg
+            ),
+            image.deg
+          )
+          setBinarization({
+            ...binarization,
+            backup: null,
+          })
+        }
+      }
+
+      function onCodeGeneratorClear() {
+        setColorGenerator([])
+      }
+
+      function onCodeGeneratorPop() {
+        setColorGenerator(colorGenerator.slice(0, -1))
+      }
+
+      function onFetch() {
+        vscode.postMessage({ command: 'fetch' })
+      }
+
+      function onOpenLocal() {
+        vscode.postMessage({ command: 'openLocal' })
+      }
+
+      function onSaveAs() {
+        image.jimp.getBase64(Jimp.MIME_PNG, (_, v) => {
+          vscode.postMessage({
+            command: 'saveImage',
+            payload: v.slice(22),
+          })
+        })
+      }
+
+      function onCut() {
+        setCut({
+          ...cut,
+          enabled: true,
+          callback: (jimp) => {
+            jimp.getBase64(Jimp.MIME_PNG, (_, data) => {
+              vscode.postMessage({
+                command: 'saveImage',
+                payload: data.slice(22),
+              })
+            })
+          },
+        })
+      }
+
+      function onSelectFont(f) {
+        setCut({
+          ...cut,
+          enabled: true,
+          callback: (jimp) => {
+            let [x1, y1, x2, y2] = [-1, -1, -1, -1]
+            jimp.scan(
+              0,
+              0,
+              jimp.bitmap.width,
+              jimp.bitmap.height,
+              (x, y, index) => {
+                const r = jimp.bitmap.data[index + 0]
+                const g = jimp.bitmap.data[index + 1]
+                const b = jimp.bitmap.data[index + 2]
+                if (!r && !g && !b) {
+                  if (x1 == -1) {
+                    x1 = x
+                  } else {
+                    x1 = Math.min(x, x1)
+                  }
+                  if (y1 == -1) {
+                    y1 = y
+                  } else {
+                    y1 = Math.min(y, y1)
+                  }
+                  if (x2 == -1) {
+                    x2 = x
+                  } else {
+                    x2 = Math.max(x, x2)
+                  }
+                  if (y2 == -1) {
+                    y2 = y
+                  } else {
+                    y2 = Math.max(y, y2)
+                  }
+                }
+              }
+            )
+            if (x1 !== -1 && y1 !== -1 && x2 !== -1 && y2 !== -1) {
+              jimp
+                .crop(x1, y1, x2 - x1 + 1, y2 - y1 + 1)
+                .getBase64(Jimp.MIME_PNG, (_, data) => {
+                  f(data.slice(22))
+                })
+            }
+          },
+        })
+      }
+
+      function onRotate(e) {
+        initImage(
+          simpleRotate(image.jimp.clone(), 360 - image.deg + parseInt(e.key)),
+          parseInt(e.key)
+        )
+      }
+
+      return (
+        <Layout>
+          <Sider className="left" theme="dark">
+            <CursorInfo crop={crop} cursor={cursor} />
+            <ColorRecord colors={colorRecord} />
+            <Binarization
+              jimp={image.jimp}
+              onBinarization={onBinarization}
+              onReset={onReset}
+              cursor={cursor}
+              done={binarization.backup !== null}
+            />
+            <Divider
+              style={{ margin: '10px 0 0 0' }}
+              orientation="left"
+              plain
+            >
+              <i class="material-icons icon">code</i> 生成器
+            </Divider>
+            <Tabs defaultActiveKey="1" size="small">
+              <TabPane
+                tab={
+                  <span>
+                    <i class="material-icons icon">palette</i> 找色
+                  </span>
+                }
+                key="1"
+              >
+                <CodeGenerator
+                  colors={colorGenerator}
+                  record={colorRecord}
+                  onClear={onCodeGeneratorClear}
+                  onPop={onCodeGeneratorPop}
+                />
+              </TabPane>
+              <TabPane
+                tab={
+                  <span>
+                    <i class="material-icons icon">font_download</i> 字库
+                  </span>
+                }
+                key="2"
+              >
+                <FontLib
+                  binarization={{
+                    done: binarization.backup !== null,
+                    colors: binarization.colors,
+                    fuzzy: binarization.fuzzy,
+                  }}
+                  onSelect={onSelectFont}
+                />
+              </TabPane>
+            </Tabs>
+          </Sider>
+          <Layout className="right">
+            <div className="header">
+              <Button onClick={onFetch}>
+                <i class="material-icons icon">satellite</i> 远程截图
+              </Button>
+              <Button onClick={onOpenLocal}>
+                <i class="material-icons icon">insert_photo</i> 本地图片
+              </Button>
+              <Button onClick={onSaveAs}>
+                <i class="material-icons icon">save</i> 保存
+              </Button>
+              <Button onClick={onCut}>
+                <i class="material-icons icon">crop</i> 裁剪
+              </Button>
+              <Dropdown
+                overlay={
+                  <Menu onClick={onRotate}>
+                    <Menu.Item key="0">0度</Menu.Item>
+                    <Menu.Item key="90">90度</Menu.Item>
+                    <Menu.Item key="180">180度</Menu.Item>
+                    <Menu.Item key="270">-90度</Menu.Item>
+                  </Menu>
+                }
+              >
+                <Button>
+                  <i class="material-icons icon">rotate_right</i> 旋转
+                </Button>
+              </Dropdown>
+            </div>
+            <div className="content" ref={contentRef}>
+              <img
+                className="img"
+                src={image.base64}
+                alt=""
+                draggable="false"
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMove}
+                onMouseLeave={onMouseLeave}
+                onMouseUp={onMouseUp}
+              />
+            </div>
+          </Layout>
+        </Layout>
+      )
+    }
+  </script>
+</head>
+
+<body>
+  <div id="app"></div>
+</body>
+
+</html>

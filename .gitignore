@@ -1,0 +1,4 @@
+/node_modules/
+/server/meta/
+/server/log/
+/*.vsix
