@@ -1,0 +1,15 @@
+{
+  "config.workspace.preloadFileSize": "Skip files larger than this value (KB) when preloading",
+  "config.color.mode": "Color mode",
+  "config.color.mode.Grammar": "Grammar color",
+  "config.color.mode.Semantic": "Semantic color",
+  "config.colorDecorators.enabled": "Enable color decorators",
+  "config.format.enabled": "Enable format",
+  "config.format.lineWidth": "Maximum length of a line",
+  "config.format.singleQuote": "Whether to use single or double quotes on strings",
+  "config.completion.enabled": "Enable completion",
+  "config.hover.enabled": "Enable hover",
+  "config.signatureHelp.enabled": "Enable signature help",
+  "config.diagnostics.enabled": "Enable diagnostics",
+  "config.diagnostics.disable": "Disabled diagnostic"
+}

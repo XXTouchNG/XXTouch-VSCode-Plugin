@@ -1,0 +1,15 @@
+{
+  "config.workspace.preloadFileSize": "预加载时跳过大小大于该值（KB）的文件",
+  "config.color.mode": "着色模式",
+  "config.color.mode.Grammar": "语法着色",
+  "config.color.mode.Semantic": "语义着色",
+  "config.colorDecorators.enabled": "启用颜色预览",
+  "config.format.enabled": "启用代码格式化",
+  "config.format.lineWidth": "每行最大字符数",
+  "config.format.singleQuote": "字符串是否使用单引号",
+  "config.completion.enabled": "启用代码补全",
+  "config.hover.enabled": "启用鼠标悬停",
+  "config.signatureHelp.enabled": "启用函数参数提示",
+  "config.diagnostics.enabled": "启用代码诊断",
+  "config.diagnostics.disable": "禁用的诊断项"
+}

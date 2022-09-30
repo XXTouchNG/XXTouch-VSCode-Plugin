@@ -1,0 +1,311 @@
+{
+	"name": "xxtouch",
+	"displayName": "XXTouchNG",
+	"description": "XXTouchNG 脚本编写帮助插件",
+	"version": "3.0.1",
+	"icon": "assets/icon.png",
+	"publisher": "xxtouch",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/XXTouchNG/XXTouch-VSCode-Plugin"
+	},
+	"engines": {
+		"vscode": "^1.52.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onLanguage:lua",
+		"onView:xxtouch-device-view",
+		"onView:xxtouch-file-view",
+		"onView:xxtouch-info-view",
+		"onCommand:xxtouch.fetch.screen"
+	],
+	"main": "./out/extension.js",
+	"bin": {
+		"highlight": "node_modules/cli-highlight/bin/highlight"
+	},
+	"scripts": {
+		"vscode:prepublish": "rm -rf server/meta/Lua* && rm -rf server/log/* && codesign --remove-signature server/bin/macOS/* && npm install",
+		"postinstall": "ldid -S server/bin/macOS/* && mkdir -p node_modules/.bin && (ln -s ../cli-highlight/bin/highlight node_modules/.bin/highlight || true)",
+		"publish": "vsce package"
+	},
+	"devDependencies": {
+		"@types/diff": "^5.0.2",
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.2.0",
+		"@types/node": "^14.14.14",
+		"@types/tar": "^4.0.4",
+		"@types/vscode": "^1.52.0",
+		"glob": "^7.1.6",
+		"mocha": "^8.2.1"
+	},
+	"dependencies": {
+		"axios": "^0.21.0",
+		"broadcast-address": "^1.0.2",
+		"diff": "^5.0.0",
+		"lua-fmt-ext": "^3.0.5",
+		"tar": "^6.0.5",
+		"vscode-languageclient": "^7.0.0",
+		"cli-highlight": "git+https://github.com/Lessica/cli-highlight.git"
+	},
+	"contributes": {
+		"configuration": {
+			"title": "xxtouch",
+			"properties": {
+				"xxtouch.lua.workspace.preloadFileSize": {
+					"default": 100,
+					"type": "integer",
+					"description": "%config.workspace.preloadFileSize%"
+				},
+				"xxtouch.lua.color.mode": {
+					"type": "string",
+					"default": "Semantic",
+					"enum": [
+						"Grammar",
+						"Semantic"
+					],
+					"description": "%config.color.mode%",
+					"enumDescriptions": [
+						"%config.color.mode.Grammar%",
+						"%config.color.mode.Semantic%"
+					]
+				},
+				"xxtouch.lua.colorDecorators.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "%config.colorDecorators.enabled%"
+				},
+				"xxtouch.lua.format.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "%config.format.enabled%"
+				},
+				"xxtouch.lua.format.lineWidth": {
+					"type": "integer",
+					"default": 1000,
+					"description": "%config.format.lineWidth%"
+				},
+				"xxtouch.lua.format.singleQuote": {
+					"type": "boolean",
+					"default": false,
+					"description": "%config.format.singleQuote%"
+				},
+				"xxtouch.lua.completion.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "%config.completion.enabled%"
+				},
+				"xxtouch.lua.hover.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "%config.hover.enabled%"
+				},
+				"xxtouch.lua.signatureHelp.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "%config.signatureHelp.enabled%"
+				},
+				"xxtouch.lua.diagnostics.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "%config.diagnostics.enabled%"
+				},
+				"xxtouch.lua.diagnostics.disable": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [
+						"undefined-global",
+						"lowercase-global"
+					],
+					"description": "%config.diagnostics.disable%"
+				}
+			}
+		},
+		"snippets": [
+			{
+				"language": "lua",
+				"path": "snippets/lua.json"
+			}
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "xxtouch-container",
+					"title": "XXTouchNG",
+					"icon": "assets/icon.png"
+				}
+			]
+		},
+		"views": {
+			"xxtouch-container": [
+				{
+					"id": "xxtouch-device-view",
+					"name": "设备列表"
+				},
+				{
+					"id": "xxtouch-file-view",
+					"name": "设备文件"
+				},
+				{
+					"id": "xxtouch-info-view",
+					"name": "设备信息"
+				}
+			]
+		},
+		"commands": [
+			{
+				"command": "xxtouch.device.scan",
+				"title": "扫描",
+				"icon": "$(search-refresh)"
+			},
+			{
+				"command": "xxtouch.device.add",
+				"title": "添加",
+				"icon": "$(add)"
+			},
+			{
+				"command": "xxtouch.device.trash",
+				"title": "清空",
+				"icon": "$(trash)"
+			},
+			{
+				"command": "xxtouch.device.ui",
+				"title": "远程UI"
+			},
+			{
+				"command": "xxtouch.fetch.screen",
+				"title": "屏幕抓抓"
+			},
+			{
+				"command": "xxtouch.device.nlog",
+				"title": "网络日志"
+			},
+			{
+				"command": "xxtouch.file.refresh",
+				"title": "刷新",
+				"icon": "$(search-refresh)"
+			},
+			{
+				"command": "xxtouch.file.download",
+				"title": "下载"
+			},
+			{
+				"command": "xxtouch.file.upload",
+				"title": "上传"
+			},
+			{
+				"command": "xxtouch.file.delete",
+				"title": "删除"
+			},
+			{
+				"command": "xxtouch.script.run",
+				"title": "远程运行",
+				"icon": "$(run)"
+			},
+			{
+				"command": "xxtouch.script.debug",
+				"title": "远程调试",
+				"icon": "$(debug-alt)"
+			},
+			{
+				"command": "xxtouch.script.stop",
+				"title": "远程停止",
+				"icon": "$(stop)"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "xxtouch.device.nlog",
+				"key": "F8"
+			}
+		],
+		"menus": {
+			"view/title": [
+				{
+					"command": "xxtouch.device.scan",
+					"when": "view == xxtouch-device-view",
+					"group": "navigation"
+				},
+				{
+					"command": "xxtouch.device.add",
+					"when": "view == xxtouch-device-view",
+					"group": "navigation"
+				},
+				{
+					"command": "xxtouch.device.trash",
+					"when": "view == xxtouch-device-view",
+					"group": "navigation"
+				},
+				{
+					"command": "xxtouch.file.refresh",
+					"when": "view == xxtouch-file-view",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "xxtouch.device.ui",
+					"when": "view == xxtouch-device-view",
+					"group": "navigation@1"
+				},
+				{
+					"command": "xxtouch.fetch.screen",
+					"when": "view == xxtouch-device-view",
+					"group": "navigation@2"
+				},
+				{
+					"command": "xxtouch.device.nlog",
+					"when": "view == xxtouch-device-view",
+					"group": "navigation@3"
+				},
+				{
+					"command": "xxtouch.file.download",
+					"when": "view == xxtouch-file-view && viewItem == file",
+					"group": "navigation@1"
+				},
+				{
+					"command": "xxtouch.file.upload",
+					"when": "view == xxtouch-file-view && viewItem == dir",
+					"group": "navigation@1"
+				},
+				{
+					"command": "xxtouch.file.delete",
+					"when": "view == xxtouch-file-view && viewItem == file",
+					"group": "navigation@2"
+				}
+			],
+			"editor/title": [
+				{
+					"command": "xxtouch.script.run",
+					"when": "resourceLangId == lua",
+					"group": "navigation@1"
+				},
+				{
+					"command": "xxtouch.script.debug",
+					"when": "resourceLangId == lua",
+					"group": "navigation@2"
+				},
+				{
+					"command": "xxtouch.script.stop",
+					"when": "resourceLangId == lua",
+					"group": "navigation@3"
+				}
+			]
+		}
+	},
+	"__metadata": {
+		"id": "1ac92acd-6d5e-4ffd-b255-cb0b6023be2c",
+		"publisherId": "8ce4087b-e0c8-4be8-a80a-e2a20d8649f5",
+		"publisherDisplayName": "XXTouch",
+		"targetPlatform": "macOS",
+		"updated": true,
+		"isPreReleaseVersion": false,
+		"preRelease": false,
+		"installedTimestamp": 1664516751977,
+		"isApplicationScoped": false
+	}
+}
