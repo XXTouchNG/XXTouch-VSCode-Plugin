@@ -17,23 +17,26 @@ const vscode = require("vscode");
 class API {
     constructor(ip) {
         this.axios = axios_1.default.create({
-            baseURL: `http://${ip}:46952/api`,
-            timeout: 30 * 1000,
+            baseURL: `http://${ip}:46952/api/`,
+            timeout: 2 * 1000,
             maxContentLength: Infinity,
             maxBodyLength: Infinity,
         });
         this.xxtouch = axios_1.default.create({
-            baseURL: `http://${ip}:46952`,
-            timeout: 30 * 1000,
+            baseURL: `http://${ip}:46952/`,
+            timeout: 5 * 1000,
             maxContentLength: Infinity,
             maxBodyLength: Infinity,
         });
     }
     error(res) {
         if (res instanceof Error) {
-            vscode.window.showErrorMessage(`错误: ${res.toString()}`);
-        }
-        else {
+            if (res.response && res.response.data) {
+                vscode.window.showErrorMessage(`错误 ${res.response.status}: ${res.response.data.toString()}`);
+            } else {
+                vscode.window.showErrorMessage(`错误: ${res.toString()}`);
+            }
+        } else {
             vscode.window.showErrorMessage(`错误: ${res.status} ${res.statusText}`);
         }
     }

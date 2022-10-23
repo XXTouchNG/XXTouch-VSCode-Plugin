@@ -286,7 +286,7 @@ function initDeviceView(context) {
                     vscode.window.setStatusBarMessage(`代码模板保存成功`, 5000);
                     break;
                 default:
-                    console.log(`unknown ${message.command}`);
+                    console.error(`unknown command ${message.command}`);
                     break;
             }
         }));
