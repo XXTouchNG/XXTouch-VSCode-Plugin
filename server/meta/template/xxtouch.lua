@@ -743,61 +743,73 @@ end
 ---@class app*
 app = {}
 
---- 获取 App 的应用程序包路径
----@param appId string App 的应用程序标识符
----@return string 应用程序包路径，如果应用不存在，返回 nil
+--- 获取 App 的捆绑包路径
+---@param appId string App 标识符
+---@return string? 捆绑包路径
 function app.bundle_path(appId)
 end
 
---- 获取 App 的应用程序版本
----@param appId string App 的应用程序标识符
----@return string 应用程序版本，如果应用不存在，返回 nil
+--- 获取 App 的捆绑包版本
+---@param appId string App 标识符
+---@return string? 捆绑包版本
 function app.bundle_version(appId)
 end
 
---- 获取 App 的应用存档路径
----@param appId string App 的应用程序标识符
----@return string 应用存档路径，如果应用不存在，返回 nil
+--- 获取 App 的捆绑包信息表
+---@param appId string App 标识符
+---@return table? 捆绑包信息表
+function app.bundle_info(appId)
+end
+
+--- 获取 App 的数据容器路径
+---@param appId string App 标识符
+---@return string? 数据容器路径
 function app.data_path(appId)
 end
 
---- 获取 App 的应用分组信息
----@param appId string App 的应用程序标识符
----@return table 应用分组信息，如果没有分组信息，返回 nil
+--- 获取 App 的分组信息
+---@param appId string App 标识符
+---@return table? 分组信息
 function app.group_info(appId)
 end
 
+--- 获取 App 的插件信息
+---@param appId string App 标识符
+---@return table? 插件信息
+function app.plugin_info(appId)
+end
+
 --- 弹出一个应用通知
----@param appId string App 的应用程序标识符
+---@param appId string App 标识符
 ---@param title string 应用通知的标题
 ---@param message string 应用通知的内容
 function app.pop_banner(appId, title, message)
 end
 
 --- 运行应用程序
----@param appId string App 的应用程序标识符
+---@param appId string App 标识符
 ---@return integer 应用程序运行状态，0 表示成功，其他值表示失败
 function app.run(appId)
 end
 
 --- 关闭应用程序
----@param appId string App 的应用程序标识符
+---@param appId string App 标识符
 function app.close(appId)
 end
 
 --- 关闭应用程序
----@param processId integer App 的进程标识符
+---@param processId integer 运行中 App 的进程标识符
 function app.close(processId)
 end
 
---- 模拟使用上划退出应用程序
----@param appId string App 的应用程序标识符，传入 "*" 表示关闭所有应用程序
+--- 模拟使用上划退出 App
+---@param appId string App 标识符，传入 “*” 表示关闭所有 App
 function app.quit(appId)
 end
 
---- 检测应用是否正在运行
----@param appId string App 的应用程序标识符
----@return boolean 应用是否正在运行
+--- 检测 App 是否正在运行
+---@param appId string App 标识符
+---@return boolean 是否正在运行
 function app.is_running(appId)
 end
 
@@ -806,37 +818,37 @@ end
 function app.input_text(text)
 end
 
---- 通过应用程序标识符获取应用的本地化名字
----@param appId string App 的应用程序标识符
----@return string 应用的本地化名字，如果应用不存在，返回 nil
+--- 获取 App 的本地化名字
+---@param appId string App 标识符
+---@return string? 本地化名字
 function app.localized_name(appId)
 end
 
---- 通过应用程序标识符获取应用的图标数据
----@param appId string App 的应用程序标识符
----@return string 应用的 png 图标数据，如果应用不存在，返回 nil
+--- 获取 App 的图标数据
+---@param appId string App 标识符
+---@return string? 图标 PNG 格式数据
 function app.png_data_for_bid(appId)
 end
 
---- 通过应用程序标识符获取进程标志符
----@param appId string App 的应用程序标识符
----@return integer 应用程序进程标志符，如果应用未运行，返回 0
+--- 获取正在运行 App 的进程号
+---@param appId string App 标识符
+---@return integer 运行中 App 的进程标志符，如果 App 未运行，返回 0
 function app.pid_for_bid(appId)
 end
 
---- 获取应用程序当前内存消耗
----@param appId string App 的应用程序标识符
----@return number 应用程序当前内存消耗，单位为兆字节，如果应用未运行，返回 nil
+--- 获取 App 当前内存消耗
+---@param appId string App 标识符
+---@return number? 当前内存消耗，单位为兆字节
 function app.used_memory(appId)
 end
 
---- 获取前台应用的应用程序标识符
----@return string 前台应用的应用程序标识符，如果没有前台应用，返回 nil
+--- 获取前台 App 的标识符
+---@return string? 前台 App 标识符
 function app.front_bid()
 end
 
---- 获取前台应用的进程标识符
----@return integer 前台应用的进程标识符，如果没有前台应用，返回 0
+--- 获取前台 App 的进程标识符
+---@return integer 前台运行中 App 的进程标识符，如果没有前台 App，返回 0
 function app.front_pid()
 end
 
@@ -845,25 +857,25 @@ end
 function app.open_url(url)
 end
 
---- 获取设备所有应用的应用程序标识符
----@return table 设备所有应用的应用程序标识符
+--- 获取 App 标识符列表
+---@return table 设备所有 App 的标识符顺序表
 function app.bundles()
 end
 
---- 获取当前设备的进程列表
----@return table 当前设备的进程列表，结构是这样 { {pid = 进程号1, name = 进程名1 }, {pid = 进程号2, name = 进程名2 }, ... }
+--- 获取进程列表
+---@return table 结构是这样 { {pid = 进程号1, name = 进程名1 }, {pid = 进程号2, name = 进程名2 }, ... }
 function app.all_procs()
 end
 
---- 安装 IPA 应用程序包
----@param ipaPath string IPA 应用程序包的路径
----@return boolean 安装结果，true 表示成功，false 表示失败
+--- 安装 IPA 包
+---@param ipaPath string IPA 文件路径
+---@return boolean 是否安装成功
 function app.install(ipaPath)
 end
 
---- 卸载应用程序
----@param appId string App 的应用程序标识符
----@return boolean 卸载结果，true 表示成功，false 表示失败
+--- 卸载一个 App
+---@param appId string App 标识符
+---@return boolean 是否卸载成功
 function app.uninstall(appId)
 end
 
