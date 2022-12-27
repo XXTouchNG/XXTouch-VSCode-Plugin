@@ -347,50 +347,20 @@ end
 ---@class sys*
 sys = {}
 
---- 获取系统当前语言
----@return string 当前语言（BCP 47）
-function sys.language()
-end
-
---- 设置系统当前语言
----@param language string 当前语言（BCP 47）
-function sys.set_language(language)
-end
-
---- 获取系统当前区域
----@return string 当前区域标识符
-function sys.locale()
-end
-
---- 设置系统当前区域
----@param locale string 当前区域标识符
-function sys.set_locale(locale)
-end
-
---- 获取系统当前时区
----@return string 当前时区标识符
-function sys.timezone()
-end
-
---- 设置系统当前时区
----@param timezone string 当前时区标识符
-function sys.set_timezone(timezone)
-end
-
 --- 显示提示文字
 ---@param text string 文字内容
----@param orientation? integer 文字方向，默认为最后一次调用 screen.init 所设的那个方向
+---@param orientation? integer 旋转方向，默认为最后一次调用 screen.init 所设置的方向
 function sys.toast(text, orientation)
 end
 
 --- 弹出系统提示
 ---@param content string 文字内容
----@param delayBeforeAutoDismissal? integer 自动消失延迟，单位毫秒，设置为 0 不自动消失，默认为 0
----@param title? string 标题，默认为 "脚本提示"
----@param button1? string 第一个按钮文字，默认为 "好"
----@param button2? string 第二个按钮文字，默认不显示这个按钮
----@param button3? string 第三个按钮文字，默认不显示这个按钮
----@return integer 按钮索引，0 表示第一个按钮，1 表示第二个按钮，2 表示第三个按钮，3 表示超时没有按钮被点击
+---@param delayBeforeAutoDismissal? integer 自动消失秒数，设置为 0 不自动消失，默认为 0
+---@param title? string 标题，默认为 “脚本提示”
+---@param button1? string 默认取消按钮的标题，默认为 “好”
+---@param button2? string 额外的第一个按钮标题，默认不显示这个按钮
+---@param button3? string 额外的第二个按钮标题，默认不显示这个按钮
+---@return integer 按钮索引，0 表示取消按钮，1 表示额外的第一个按钮，2 表示额外的第二个按钮，3 表示超时（没有按钮被点击）
 function sys.alert(content, delayBeforeAutoDismissal, title, button1, button2, button3)
 end
 
@@ -401,78 +371,78 @@ function sys.input_box(content)
 end
 
 --- 弹出输入提示
----@param title string 标题，默认为 "脚本提示"
+---@param title string 标题，默认为 “脚本提示”
 ---@param content string 提示内容
----@param delayBeforeAutoDismissal? integer 自动消失延迟，单位毫秒，设置为 0 不自动消失，默认为 0
+---@param delayBeforeAutoDismissal? integer 自动消失秒数，设置为 0 不自动消失，默认为 0
 ---@return string 输入的文字
 function sys.input_box(title, content, delayBeforeAutoDismissal)
 end
 
 --- 弹出输入提示
----@param title string 标题，默认为 "脚本提示"
+---@param title string 标题，默认为 “脚本提示”
 ---@param content string 提示内容
 ---@param placeholder1 string 第一个输入框内提示文字
----@param delayBeforeAutoDismissal? integer 自动消失延迟，单位毫秒，设置为 0 不自动消失，默认为 0
+---@param delayBeforeAutoDismissal? integer 自动消失秒数，设置为 0 不自动消失，默认为 0
 ---@return string 输入的文字
 function sys.input_box(title, content, placeholder1, delayBeforeAutoDismissal)
 end
 
 --- 弹出输入提示
----@param title string 标题，默认为 "脚本提示"
+---@param title string 标题，默认为 “脚本提示”
 ---@param content string 提示内容
 ---@param placeholder1 string 第一个输入框内提示文字
 ---@param text1 string 第一个输入框默认文字
----@param delayBeforeAutoDismissal? integer 自动消失延迟，单位毫秒，设置为 0 不自动消失，默认为 0
+---@param delayBeforeAutoDismissal? integer 自动消失秒数，设置为 0 不自动消失，默认为 0
 ---@return string 输入的文字
 function sys.input_box(title, content, placeholder1, text1, delayBeforeAutoDismissal)
 end
 
 --- 弹出输入提示
----@param title string 标题，默认为 "脚本提示"
+---@param title string 标题，默认为 “脚本提示”
 ---@param content string 提示内容
 ---@param placeholder1 string 第一个输入框内提示文字
 ---@param text1 string 第一个输入框默认文字
----@param button1 string 第一个按钮文字，默认为 "好"
----@param delayBeforeAutoDismissal? integer 自动消失延迟，单位毫秒，设置为 0 不自动消失，默认为 0
+---@param button1 string 第一个按钮文字，默认为 “好”
+---@param delayBeforeAutoDismissal? integer 自动消失秒数，设置为 0 不自动消失，默认为 0
 ---@return string 输入的文字
 function sys.input_box(title, content, placeholder1, text1, button1, delayBeforeAutoDismissal)
 end
 
 --- 弹出输入提示
----@param title string 标题，默认为 "脚本提示"
+---@param title string 标题，默认为 “脚本提示”
 ---@param content string 提示内容
 ---@param placeholder1 string 第一个输入框内提示文字
 ---@param text1 string 第一个输入框默认文字
----@param button1 string 第一个按钮文字，默认为 "好"
+---@param button1 string 第一个按钮文字，默认为 “好”
 ---@param button2 string 第二个按钮文字
----@param delayBeforeAutoDismissal? integer 自动消失延迟，单位毫秒，设置为 0 不自动消失，默认为 0
+---@param delayBeforeAutoDismissal? integer 自动消失秒数，设置为 0 不自动消失，默认为 0
 ---@return string 输入的文字
 function sys.input_box(title, content, placeholder1, text1, button1, button2, delayBeforeAutoDismissal)
 end
 
 --- 弹出输入提示
----@param title string 标题，默认为 "脚本提示"
+---@param title string 标题，默认为 “脚本提示”
 ---@param content string 提示内容
 ---@param placeholder1 string 第一个输入框内提示文字
 ---@param text1 string 第一个输入框默认文字
----@param button1 string 第一个按钮文字，默认为 "好"
+---@param button1 string 第一个按钮文字，默认为 “好”
 ---@param button2 string 第二个按钮文字
 ---@param button3 string 第三个按钮文字
----@param delayBeforeAutoDismissal? integer 自动消失延迟，单位毫秒，设置为 0 不自动消失，默认为 0
+---@param delayBeforeAutoDismissal? integer 自动消失秒数，设置为 0 不自动消失，默认为 0
 ---@return string 输入的文字
 ---@return integer 按钮索引，0 表示第一个按钮，1 表示第二个按钮，2 表示第三个按钮
 function sys.input_box(title, content, placeholder1, text1, button1, button2, button3, delayBeforeAutoDismissal)
 end
 
 --- 弹出输入提示
----@param title string 标题，默认为 "脚本提示"
+---@param title string 标题，默认为 “脚本提示”
 ---@param content string 提示内容
 ---@param placeholderGroup table 输入框提示文字组，格式为 { "第一个输入框内提示文字", "第二个输入框内提示文字" }
 ---@param textGroup? table 输入框默认文字组，格式为 { "第一个输入框默认文字", "第二个输入框默认文字" }
----@param button1? string 第一个按钮文字，默认为 "好"
+---@param button1? string 第一个按钮文字，默认为 “好”
 ---@param button2? string 第二个按钮文字
 ---@param button3? string 第三个按钮文字
----@param delayBeforeAutoDismissal? integer 自动消失延迟，单位毫秒，设置为 0 不自动消失，默认为 0
+---@param delayBeforeAutoDismissal? integer 自动消失秒数，设置为 0 不自动消失，默认为 0
 ---@return string 第一个输入框输入的文字
 ---@return string 第二个输入框输入的文字
 ---@return integer 按钮索引，0 表示第一个按钮，1 表示第二个按钮，2 表示第三个按钮
@@ -480,8 +450,8 @@ function sys.input_box(title, content, placeholderGroup, textGroup, button1, but
 end
 
 --- 输入文字
----@param text string 输入的文字，不支持 "\b" (退格键)
----@param pressEnter? boolean 是否按下回车键，默认为 false
+---@param text string 需要输入的文字，不支持 "\b"（退格键）
+---@param pressEnter? boolean 输入完成按下回车键，默认为 false
 function sys.input_text(text, pressEnter)
 end
 
@@ -496,17 +466,17 @@ function sys.sleep(delay)
 end
 
 --- 获取当前毫秒级时间戳
----@return integer 毫秒级时间戳
+---@return integer 毫秒级 UNIX 时间戳
 function sys.mtime()
 end
 
 --- 获取网络时间戳
----@return integer 秒级网络时间戳
+---@return integer 秒级网络 UNIX 时间戳
 function sys.net_time()
 end
 
 --- 产生一个真随机数
----@return integer 真随机数，范围 0~4294967295
+---@return integer 真随机数，范围 0 至 4294967295
 function sys.rnd()
 end
 
@@ -562,10 +532,187 @@ end
 function sys.xtversion()
 end
 
+--- 重启春板
+function sys.respring()
+end
+
+--- 重启设备
+function sys.reboot()
+end
+
+--- 关机
+function sys.halt()
+end
+
+--- 软重启
+function sys.ldrestart()
+end
+
+--- 获取系统当前语言
+---@return string 当前语言（BCP 47）
+function sys.language()
+end
+
+--- 设置系统当前语言
+---@param language string 当前语言（BCP 47）
+function sys.set_language(language)
+end
+
+--- 获取系统当前区域
+---@return string 当前区域标识符
+function sys.locale()
+end
+
+--- 设置系统当前区域
+---@param locale string 当前区域标识符
+function sys.set_locale(locale)
+end
+
+--- 获取系统当前时区
+---@return string 当前时区标识符
+function sys.timezone()
+end
+
+--- 设置系统当前时区
+---@param timezone string 当前时区标识符
+function sys.set_timezone(timezone)
+end
+
+--- 获取外观样式
+---@return integer 外观样式，1 为浅色，2 为深色
+function sys.appearance()
+end
+
+--- 设置外观样式
+---@param appearance integer 外观样式，1 为浅色，2 为深色
+function sys.set_appearance(appearance)
+end
+
+--- 获取文字大小
+---@return integer 文字大小，取值范围 0 至 11，默认为 3
+function sys.textsize()
+end
+
+--- 设置文字大小
+---@param size integer 文字大小，取值范围 0 至 11，默认为 3
+function sys.set_textsize(size)
+end
+
+--- 获取粗体模式状态
+---@return boolean 是否开启粗体模式
+function sys.is_boldtext_on()
+end
+
+--- 打开粗体模式
+function sys.boldtext_on()
+end
+
+--- 关闭粗体模式
+function sys.boldtext_off()
+end
+
+--- 获取放大模式状态
+---@return boolean 是否开启放大模式
+function sys.is_zoom_on()
+end
+
+--- 打开放大模式
+function sys.zoom_on()
+end
+
+--- 关闭放大模式
+function sys.zoom_off()
+end
+
+--- 设置壁纸
+---@param image string 浅色图片路径
+---@param darkImage? string 深色图片路径
+---@param position? integer 壁纸生效位置，取值范围 1 ~ 3，1 为锁屏，2 为主屏幕，3 为锁屏和主屏幕，默认为 3
+---@param parallel? boolean 是否采用平行透视效果，默认为 false
+function sys.set_wallpaper(image, darkImage, position, parallel)
+end
+
+--- 获取图标布局
+---@return table 图标布局表
+function sys.icon_state()
+end
+
+--- 设置图标布局
+---@param state table 图标布局表
+function sys.set_icon_state(state)
+end
+
+--- 获取 Assistive Touch 状态
+---@return boolean 是否开启 Assistive Touch
+function sys.is_assistive_touch_on()
+end
+
+--- 打开 Assistive Touch
+function sys.assistive_touch_on()
+end
+
+--- 关闭 Assistive Touch
+function sys.assistive_touch_off()
+end
+
+--- 获取减弱动态效果状态
+---@return boolean 是否开启减弱动态效果
+function sys.is_reduce_motion_on()
+end
+
+--- 打开减弱动态效果
+function sys.reduce_motion_on()
+end
+
+--- 关闭减弱动态效果
+function sys.reduce_motion_off()
+end
+
+--- 获取定位服务状态
+---@return boolean 是否开启定位服务
+function sys.is_location_services_on()
+end
+
+--- 打开定位服务
+function sys.location_services_on()
+end
+
+--- 关闭定位服务
+function sys.location_services_off()
+end
+
+--- 获取追踪功能状态
+---@return boolean 是否开启追踪功能
+function sys.is_tracking_on()
+end
+
+--- 打开追踪功能
+function sys.tracking_on()
+end
+
+--- 关闭追踪功能
+function sys.tracking_off()
+end
+
+--- 获取后台应用程序刷新状态
+---@return integer 后台应用程序刷新状态，取值范围 0 至 2，0 为关闭，1 为仅 Wi-Fi，2 为 Wi-Fi 和蜂窝网络
+function sys.background_app_refresh_state()
+end
+
+--- 设置后台应用程序刷新状态
+---@param state integer 后台应用程序刷新状态，取值范围 0 至 2，0 为关闭，1 为仅 Wi-Fi，2 为 Wi-Fi 和蜂窝网络
+function sys.set_background_app_refresh_state(state)
+end
+
 --- 设置日志条颜色
 --- 主屏幕最前方日志条的背景颜色，默认为黑色，脚本运行结束后会还原到初始的颜色。
---- @param color string 颜色的十六进制 RGBA 值，如 "#FF0000" 或者 "#FF000099"
+---@param color string 颜色的十六进制 RGBA 值，如 "#FF0000" 或者 "#FF000099"
 function sys.set_tooltip_color(color)
+end
+
+--- 系统还原
+---@param mode string 还原类型名称
+function sys.reset(mode)
 end
 
 
