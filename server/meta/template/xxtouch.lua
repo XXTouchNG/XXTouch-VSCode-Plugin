@@ -907,12 +907,18 @@ function device.unlock_orien()
 end
 
 --- 获取屏幕旋转锁定状态
----@return boolean 屏幕旋转锁定状态，true 表示锁定，false 表示未锁定
+---@return boolean 是否已开启屏幕旋转锁定
 function device.is_orien_locked()
 end
 
 --- 振动设备
 function device.vibrator()
+end
+
+--- 播放声音
+---@param path string 声音文件路径
+---@param isAsync? boolean 是否异步播放，默认为 false
+function device.play_sound(path, isAsync)
 end
 
 --- 获取设备类型
@@ -961,20 +967,20 @@ function device.battery_level()
 end
 
 --- 获取当前设备充电状态
----@return string 当前设备充电状态，"Charging" 表示充电，"Unplugged" 表示未充电，"Full" 表示充电满
+---@return string 当前设备充电状态，“Charging” 表示充电，“Unplugged” 表示未充电，“Full” 表示充电满
 function device.battery_state()
 end
 
---- 打开设备 WiFi
+--- 打开设备 Wi-Fi
 function device.turn_on_wifi()
 end
 
---- 关闭设备 WiFi
+--- 关闭设备 Wi-Fi
 function device.turn_off_wifi()
 end
 
---- 获取设备 WiFi 状态
----@return boolean 设备 WiFi 状态，true 表示开启，false 表示关闭
+--- 获取设备 Wi-Fi 状态
+---@return boolean 是否已开启设备 Wi-Fi
 function device.is_wifi_on()
 end
 
@@ -987,7 +993,7 @@ function device.turn_off_data()
 end
 
 --- 获取设备蜂窝数据状态
----@return boolean 设备蜂窝数据状态，true 表示开启，false 表示关闭
+---@return boolean 是否已开启设备蜂窝数据网络
 function device.is_data_on()
 end
 
@@ -1000,7 +1006,7 @@ function device.turn_off_bluetooth()
 end
 
 --- 获取设备蓝牙状态
----@return boolean 设备蓝牙状态，true 表示开启，false 表示关闭
+---@return boolean 是否已开启设备蓝牙
 function device.is_bluetooth_on()
 end
 
@@ -1013,7 +1019,7 @@ function device.turn_off_airplane()
 end
 
 --- 获取设备飞行模式状态
----@return boolean 设备飞行模式状态，true 表示开启，false 表示关闭
+---@return boolean 是否已开启设备飞行模式
 function device.is_airplane_on()
 end
 
@@ -1026,13 +1032,13 @@ function device.turn_off_vpn()
 end
 
 --- 判断当前是否打开了 VPN
----@return boolean 当前是否打开了 VPN，true 表示打开了 VPN，false 表示没有打开 VPN
+---@return boolean 是否已开启设备的 VPN 功能
 function device.is_vpn_on()
 end
 
 --- 打开设备闪光灯
 ---@param level number 设备闪光灯的亮度，0.0 表示关闭，1.0 表示最亮
-function device.flash_on()
+function device.flash_on(level)
 end
 
 --- 关闭设备闪光灯
@@ -1040,60 +1046,8 @@ function device.flash_off()
 end
 
 --- 判断设备闪光灯是否打开
----@return boolean 设备闪光灯是否打开，true 表示打开，false 表示关闭
+---@return boolean 是否已打开设备闪光灯
 function device.is_flash_on()
-end
-
---- 打开“减少动态效果”开关
-function device.reduce_motion_on()
-end
-
---- 关闭“减少动态效果”开关
-function device.reduce_motion_off()
-end
-
---- 判断“减少动态效果”开关是否打开
----@return boolean “减少动态效果”开关是否打开，true 表示打开，false 表示关闭
-function device.is_reduce_motion_on()
-end
-
---- 打开 AssistiveTouch
-function device.assistive_touch_on()
-end
-
---- 关闭 AssistiveTouch
-function device.assistive_touch_off()
-end
-
---- 判断 AssistiveTouch 是否打开
----@return boolean 是否打开，true 表示打开，false 表示关闭
-function device.is_assistive_touch_on()
-end
-
---- 打开位置服务
-function device.location_services_on()
-end
-
---- 关闭位置服务
-function device.location_services_off()
-end
-
---- 判断位置服务是否打开
----@return boolean 是否打开，true 表示打开，false 表示关闭
-function device.is_location_services_on()
-end
-
---- 允许应用弹框要求授予跟踪权限
-function device.tracking_on()
-end
-
---- 禁止应用弹框要求授予跟踪权限
-function device.tracking_off()
-end
-
---- 检查是否允许应用弹框要求授予跟踪权限
----@return boolean 是否允许，true 表示允许，false 表示禁止
-function device.is_tracking_on()
 end
 
 --- 获取背光亮度值
@@ -1116,20 +1070,39 @@ end
 function device.set_volume(volume)
 end
 
---- 扫描无线局域网
----@return table 扫描到的无线局域网设备列表
+--- 获取设备静音状态
+---@return boolean 是否已静音
+function device.is_mute_on()
+end
+
+--- 启动设备静音
+function device.mute_on()
+end
+
+--- 关闭设备静音
+function device.mute_off()
+end
+
+--- 扫描附近的无线接入点
+---@return table 扫描到的无线接入点列表，结构是这样 { {"SSID1", "BSSID1"}, {"SSID2", "BSSID2"}, ... }
 function device.scan_wifi()
 end
 
---- 加入到一个无线局域网
----@param ssid string 无线局域网的 SSID
----@param password string 无线局域网的密码
----@return boolean 加入无线局域网是否成功，true 表示成功，false 表示失败
+--- 加入一个无线接入点
+---@param ssid string 无线接入点的 SSID
+---@param password string 无线接入点的密码
+---@return boolean 加入无线接入点是否成功
 function device.join_wifi(ssid, password)
 end
 
---- 离开一个无线局域网
-function device.leave_wifi()
+--- 离开一个无线接入点
+---@param shouldForget? boolean 是否忘记这个无线接入点
+function device.leave_wifi(shouldForget)
+end
+
+--- 遗忘一个无线接入点
+---@param ssid string 无线接入点的 SSID
+function device.forget_wifi(ssid)
 end
 
 
