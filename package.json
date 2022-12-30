@@ -2,7 +2,7 @@
 	"name": "xxtouch",
 	"displayName": "XXTouchNG",
 	"description": "XXTouchNG 脚本编写帮助插件",
-	"version": "3.0.1",
+	"version": "3.0.2",
 	"icon": "assets/icon.png",
 	"publisher": "xxtouch",
 	"repository": {
@@ -44,11 +44,11 @@
 	"dependencies": {
 		"axios": "^0.21.0",
 		"broadcast-address": "^1.0.2",
+		"cli-highlight": "git+https://github.com/Lessica/cli-highlight.git",
 		"diff": "^5.0.0",
 		"lua-fmt-ext": "^3.0.5",
 		"tar": "^6.0.5",
-		"vscode-languageclient": "^7.0.0",
-		"cli-highlight": "git+https://github.com/Lessica/cli-highlight.git"
+		"vscode-languageclient": "^7.0.0"
 	},
 	"contributes": {
 		"configuration": {
