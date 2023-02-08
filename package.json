@@ -173,6 +173,14 @@
 				"icon": "$(trash)"
 			},
 			{
+				"command": "xxtouch.device.remote-launch",
+				"title": "远程启动"
+			},
+			{
+				"command": "xxtouch.device.remote-stop",
+				"title": "远程停止"
+			},
+			{
 				"command": "xxtouch.device.ui",
 				"title": "远程UI"
 			},
@@ -248,19 +256,29 @@
 			],
 			"view/item/context": [
 				{
-					"command": "xxtouch.device.ui",
+					"command": "xxtouch.device.remote-launch",
 					"when": "view == xxtouch-device-view",
 					"group": "navigation@1"
 				},
 				{
-					"command": "xxtouch.fetch.screen",
+					"command": "xxtouch.device.remote-stop",
 					"when": "view == xxtouch-device-view",
 					"group": "navigation@2"
 				},
 				{
-					"command": "xxtouch.device.nlog",
+					"command": "xxtouch.device.ui",
 					"when": "view == xxtouch-device-view",
 					"group": "navigation@3"
+				},
+				{
+					"command": "xxtouch.fetch.screen",
+					"when": "view == xxtouch-device-view",
+					"group": "navigation@4"
+				},
+				{
+					"command": "xxtouch.device.nlog",
+					"when": "view == xxtouch-device-view",
+					"group": "navigation@5"
 				},
 				{
 					"command": "xxtouch.file.download",
