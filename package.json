@@ -227,6 +227,14 @@
 		],
 		"keybindings": [
 			{
+				"command": "xxtouch.script.run",
+				"key": "F5"
+			},
+			{
+				"command": "xxtouch.script.stop",
+				"key": "F6"
+			},
+			{
 				"command": "xxtouch.device.nlog",
 				"key": "F8"
 			}

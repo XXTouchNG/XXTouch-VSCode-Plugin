@@ -281,6 +281,9 @@ function initDeviceView(context) {
         vscode.env.openExternal(vscode.Uri.parse(`http://${device.ip}:46952/index.html`));
     });
     vscode.commands.registerCommand('xxtouch.device.nlog', (device) => {
+        if (typeof device === 'undefined') {
+            device = { ip: exports.currentDevice };
+        }
         const terminalName = "网络日志 - " + (device.name || device.ip);
         let terminal = vscode.window.terminals.find((terminal) => terminal.name === terminalName);
         if (!terminal) {
