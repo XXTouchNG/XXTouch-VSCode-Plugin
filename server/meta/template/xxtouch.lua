@@ -308,6 +308,19 @@ function clear.app_data(appID) end
 ---@return table? oldTab 旧IDFAV表
 function clear.idfav(newIDFA, newIDFAVs) end
 
+--- 清理地理位置缓存
+---@return boolean 操作成败
+function clear.location_caches() end
+
+--- 清理推送通知
+---@param appID string 标识符
+---@return boolean 操作成败
+function clear.push_notifications(标识符) end
+
+--- 清理 Safari 历史记录和网站数据
+---@return boolean 操作成败
+function clear.safari() end
+
 
 --------------------------------------------------------------------------------
 -- 小饼干模块
